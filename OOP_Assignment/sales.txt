@@ -1,0 +1,11 @@
+Milk|5
+Bread|30
+Eggs|20
+Cheese|2
+Water|5
+Rice|20
+Chicken|12
+Beef|5
+Apples|26
+Bananas|8
+Avocado|10
