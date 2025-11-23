@@ -11,6 +11,8 @@ import oop_assignment.service.CustomerAccountService;
 import oop_assignment.service.CustomerService;
 import oop_assignment.util.InputUtils;
 import java.util.Scanner;
+import oop_assignment.repository.CartRepository;
+import oop_assignment.model.Cart;
 
 /**
  * Controller for handling membership interactions.
@@ -21,11 +23,12 @@ public class MembershipController {
     private final AuthService authService;
     private final CustomerService customerService;
     private final CustomerAccountService customerAccountService;
+    private final CartRepository cartRepository;
 
     public MembershipController(Scanner scanner, Session session, AuthService authService,
-                                CustomerService customerService, CustomerAccountService customerAccountService) {
+                                CustomerService customerService, CustomerAccountService customerAccountService, CartRepository cartRepository) {
         if (scanner == null || session == null || authService == null ||
-            customerService == null || customerAccountService == null) {
+            customerService == null || customerAccountService == null || cartRepository == null) {
             throw new IllegalArgumentException("Dependencies cannot be null");
         }
         this.scanner = scanner;
@@ -33,15 +36,16 @@ public class MembershipController {
         this.authService = authService;
         this.customerService = customerService;
         this.customerAccountService = customerAccountService;
+        this.cartRepository = cartRepository;
     }
 
     public void start() {
         while (true) {
-            System.out.println("=== Membership Menu ===");
+            System.out.println(Messages.MEMBERSHIP_MENU_HEADER);
             for (MembershipMenuOption option : MembershipMenuOption.values()) {
                 System.out.println(option);
             }
-            int code = InputUtils.readInt(scanner, "Enter option: ");
+            int code = InputUtils.readInt(scanner, Messages.MAIN_MENU_PROMPT);
             try {
                 MembershipMenuOption option = MembershipMenuOption.fromCode(code);
                 switch (option) {
@@ -68,53 +72,59 @@ public class MembershipController {
 
     private void handleLogin() {
         if (session.hasCustomer()) {
-            System.out.println("You are already logged in as " + session.getCurrentCustomer().getName() + ". Please log out first.");
+            System.out.println(String.format(Messages.ALREADY_LOGGED_IN, session.getCurrentCustomer().getName()));
             return;
         }
-        String idOrEmail = InputUtils.readNonEmptyString(scanner, "Enter member ID or email: ");
-        String password = InputUtils.readNonEmptyString(scanner, "Enter password: ");
+        String idOrEmail = InputUtils.readNonEmptyString(scanner, Messages.LOGIN_PROMPT_ID);
+        String password = InputUtils.readNonEmptyString(scanner, Messages.LOGIN_PROMPT_PASSWORD);
         try {
             Customer customer = authService.customerLogin(idOrEmail, password);
             session.setCurrentCustomer(customer);
-            System.out.println("Login successful. Welcome, " + customer.getName() + "!");
+            // Load user's cart
+            Cart userCart = cartRepository.loadCart(customer.getId());
+            session.setCurrentCart(userCart);
+            System.out.println(Messages.LOGIN_SUCCESS + customer.getName() + "!");
         } catch (AuthenticationFailedException e) {
-            System.out.println("Invalid credentials. Please try again.");
+            System.out.println(Messages.LOGIN_FAILED);
         }
     }
 
     private void handleLogout() {
         if (!session.hasCustomer()) {
-            System.out.println("No member is currently logged in.");
+            System.out.println(Messages.NO_MEMBER_LOGGED_IN);
         } else {
-            System.out.println("Goodbye, " + session.getCurrentCustomer().getName() + ".");
+            // Save user's cart
+            cartRepository.saveCart(session.getCurrentCustomer().getId(), session.getCurrentCart());
+            System.out.println(String.format(Messages.GOODBYE_MEMBER, session.getCurrentCustomer().getName()));
             session.clearCustomer();
+            session.setCurrentCart(new Cart()); // reset to empty
         }
     }
 
     private void handleViewBalance() {
         if (!session.hasCustomer()) {
-            System.out.println("Please log in as a member to view your wallet and points.");
+            System.out.println(Messages.LOGIN_REQUIRED_VIEW);
             return;
         }
         Customer customer = session.getCurrentCustomer();
-        System.out.println("Member: " + customer.getName());
-        System.out.println("Wallet balance: RM" + String.format("%.2f", customer.getBalance()));
-        System.out.println("Points: " + customer.getLoyaltyPoints());
+        System.out.println(String.format(Messages.MEMBER_INFO, customer.getName()));
+        System.out.println(Messages.BALANCE_DISPLAY + String.format("%.2f", customer.getBalance()));
+        System.out.println(Messages.POINTS_DISPLAY + customer.getLoyaltyPoints());
     }
 
     private void handleTopUp() {
         if (!session.hasCustomer()) {
-            System.out.println("Please log in as a member to top up your wallet.");
+            System.out.println(Messages.LOGIN_REQUIRED_TOPUP);
             return;
         }
-        double amount = InputUtils.readDouble(scanner, "Enter top-up amount (RM): ");
+        double amount = InputUtils.readDouble(scanner, Messages.TOPUP_PROMPT);
         if (amount <= 0) {
-            System.out.println("Amount must be greater than 0.");
+            System.out.println(Messages.AMOUNT_INVALID);
             return;
         }
         try {
             customerAccountService.addBalance(session.getCurrentCustomer(), amount);
-            System.out.println("Top-up successful. New balance: RM" + String.format("%.2f", session.getCurrentCustomer().getBalance()));
+            System.out.println(Messages.TOPUP_SUCCESS + String.format("%.2f", session.getCurrentCustomer().getBalance()));
         } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
         }

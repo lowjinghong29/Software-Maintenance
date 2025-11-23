@@ -16,13 +16,6 @@ public interface CustomerService {
     Customer registerCustomer(Customer newCustomer);
 
     /**
-     * Finds a customer by id.
-     * @param customerId the customer id
-     * @return the customer
-     */
-    Customer findCustomerById(String customerId);
-
-    /**
      * Gets all customers.
      * @return list of all customers
      */

@@ -4,6 +4,7 @@ package oop_assignment.model;
  * Represents a customer in the system.
  */
 public class Customer {
+    private String id;
     private String name;
     private String password;
     private String email;
@@ -14,7 +15,8 @@ public class Customer {
 
     // Constructors, getters, setters
 
-    public Customer(String name, String password, String email, String phoneNumber, String mailingAddress, int loyaltyPoints, double balance) {
+    public Customer(String id, String name, String password, String email, String phoneNumber, String mailingAddress, int loyaltyPoints, double balance) {
+        this.id = id;
         this.name = name;
         this.password = password;
         this.email = email;
@@ -22,6 +24,14 @@ public class Customer {
         this.mailingAddress = mailingAddress;
         this.loyaltyPoints = loyaltyPoints;
         this.balance = balance;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -81,7 +91,26 @@ public class Customer {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Customer customer = (Customer) obj;
+        return id != null ? id.equals(customer.id) : customer.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
+    @Override
     public String toString() {
-        return "Customer{name='" + name + "', email='" + email + "', balance=" + balance + ", loyaltyPoints=" + loyaltyPoints + "}";
+        return "Customer{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", loyaltyPoints=" + loyaltyPoints +
+                ", balance=" + balance +
+                '}';
     }
 }

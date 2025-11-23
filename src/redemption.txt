@@ -1,0 +1,6 @@
+$5 Discount Coupon,500
+Free Coffee,100
+10% Discount,300
+Buy 1 Get 1 Free,800
+Free Delivery,200
+Extra Loyalty Points,150

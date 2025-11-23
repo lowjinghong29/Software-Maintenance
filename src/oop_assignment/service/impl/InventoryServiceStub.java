@@ -29,4 +29,19 @@ public class InventoryServiceStub implements InventoryService {
     public void decreaseStock(Cart cart) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
+
+    @Override
+    public void addGrocery(Groceries grocery) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void removeGrocery(String id) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void increaseStock(String id, int amount) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 }

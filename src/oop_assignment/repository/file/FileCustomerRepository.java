@@ -37,17 +37,18 @@ public class FileCustomerRepository implements CustomerRepository {
                 if (line.trim().isEmpty()) {
                     continue;
                 }
-                String[] tokens = line.split("\\|");
-                if (tokens.length >= 7) {
+                String[] tokens = line.split(",");
+                if (tokens.length >= 8) {
                     try {
-                        String name = tokens[0].trim();
-                        String password = tokens[1].trim();
-                        String email = tokens[2].trim();
-                        String phoneNumber = tokens[3].trim();
-                        String mailingAddress = tokens[4].trim();
-                        int loyaltyPoints = Integer.parseInt(tokens[5].trim());
-                        double balance = Double.parseDouble(tokens[6].trim());
-                        Customer customer = new Customer(name, password, email, phoneNumber, mailingAddress, loyaltyPoints, balance);
+                        String id = tokens[0].trim();
+                        String name = tokens[1].trim();
+                        String password = tokens[2].trim();
+                        String email = tokens[3].trim();
+                        String phoneNumber = tokens[4].trim();
+                        String mailingAddress = tokens[5].trim();
+                        int loyaltyPoints = Integer.parseInt(tokens[6].trim());
+                        double balance = Double.parseDouble(tokens[7].trim());
+                        Customer customer = new Customer(id, name, password, email, phoneNumber, mailingAddress, loyaltyPoints, balance);
                         customers.add(customer);
                     } catch (NumberFormatException e) {
                         logger.log(Level.WARNING, "Malformed line in customers file: " + line, e);
@@ -66,7 +67,8 @@ public class FileCustomerRepository implements CustomerRepository {
     public void saveAll(List<Customer> customers) {
         List<String> lines = new ArrayList<>();
         for (Customer customer : customers) {
-            String line = String.format("%s|%s|%s|%s|%s|%d|%.2f",
+            String line = String.format("%s,%s,%s,%s,%s,%s,%d,%.2f",
+                    customer.getId(),
                     customer.getName(),
                     customer.getPassword(),
                     customer.getEmail(),

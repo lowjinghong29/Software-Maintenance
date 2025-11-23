@@ -1,6 +1,7 @@
 package oop_assignment.service;
 
 import oop_assignment.model.Customer;
+import oop_assignment.model.Staff;
 
 /**
  * Service for authentication.
@@ -14,4 +15,12 @@ public interface AuthService {
      * @return the customer
      */
     Customer customerLogin(String idOrEmail, String password);
+
+    /**
+     * Logs in a staff member.
+     * @param username the username
+     * @param password the password
+     * @return the staff
+     */
+    Staff staffLogin(String username, String password);
 }

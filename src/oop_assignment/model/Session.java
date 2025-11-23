@@ -5,6 +5,8 @@ package oop_assignment.model;
  */
 public class Session {
     private Customer currentCustomer;
+    private Staff currentStaff;
+    private Cart currentCart;
 
     public Customer getCurrentCustomer() {
         return currentCustomer;
@@ -20,5 +22,21 @@ public class Session {
 
     public void clearCustomer() {
         this.currentCustomer = null;
+    }
+
+    public Staff getCurrentStaff() {
+        return currentStaff;
+    }
+
+    public void setCurrentStaff(Staff currentStaff) {
+        this.currentStaff = currentStaff;
+    }
+
+    public Cart getCurrentCart() {
+        return currentCart;
+    }
+
+    public void setCurrentCart(Cart currentCart) {
+        this.currentCart = currentCart;
     }
 }

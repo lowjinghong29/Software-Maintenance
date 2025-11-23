@@ -4,11 +4,9 @@ package oop_assignment.menu;
  * Enum representing options in the main menu.
  */
 public enum MainMenuOption {
-    PURCHASE(1, "Purchase Groceries"),
-    REDEMPTION(2, "Redemption"),
-    MEMBERSHIP(3, "Membership Menu"),
-    REPORTS(4, "Reports"),
-    STAFF_MENU(5, "Staff Menu"),
+    STAFF(1, "Staff"),
+    CUSTOMER(2, "Customer"),
+    VIEW_CART(3, "View Cart"),
     EXIT(0, "Exit System");
 
     private final int code;

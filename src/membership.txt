@@ -1,0 +1,6 @@
+C001,John Moe,password123,newemail@example.com,019-1234566,123 Main St,50,100.00
+C002,Jane Smith,password456,jane@email.com,019-2345678,456 Elm St,30,200.00
+C003,Alice Johnson,password789,alice@email.com,019-3456789,789 Oak St,10,50.00
+C004,Bob Wilson,password000,bob@email.com,019-4567890,101 Pine St,20,75.00
+C005,Charlie Brown,password111,charlie@email.com,019-5678901,202 Oak St,40,160.00
+C006,Low Jing Hong,123321,jinghong@gmail.com,0124859965,52000 Kepong,0,10.00

@@ -1,11 +1,9 @@
 package oop_assignment.service.impl;
 
 import oop_assignment.exception.DuplicateCustomerException;
-import oop_assignment.exception.CustomerNotFoundException;
 import oop_assignment.model.Customer;
 import oop_assignment.repository.CustomerRepository;
 import oop_assignment.service.CustomerService;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,26 +22,19 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer registerCustomer(Customer newCustomer) {
-        List<Customer> all = customerRepository.findAll();
-        for (Customer c : all) {
-            if (c.getEmail().equals(newCustomer.getEmail())) {
-                throw new DuplicateCustomerException("Customer with email " + newCustomer.getEmail() + " already exists");
+        List<Customer> customers = customerRepository.findAll();
+        for (Customer c : customers) {
+            if (c.getEmail().equalsIgnoreCase(newCustomer.getEmail())) {
+                throw new DuplicateCustomerException("Customer with email " + newCustomer.getEmail() + " already exists.");
             }
         }
-        all.add(newCustomer);
-        customerRepository.saveAll(all);
+        // Generate new ID
+        int maxId = customers.stream().mapToInt(c -> Integer.parseInt(c.getId().substring(1))).max().orElse(0);
+        String newId = "C" + String.format("%03d", maxId + 1);
+        newCustomer.setId(newId);
+        customers.add(newCustomer);
+        customerRepository.saveAll(customers);
         return newCustomer;
-    }
-
-    @Override
-    public Customer findCustomerById(String customerId) {
-        List<Customer> all = customerRepository.findAll();
-        for (Customer c : all) {
-            if (c.getEmail().equals(customerId)) {
-                return c;
-            }
-        }
-        throw new CustomerNotFoundException("Customer not found for id: " + customerId);
     }
 
     @Override
@@ -53,14 +44,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void updateCustomer(Customer customer) {
-        List<Customer> all = customerRepository.findAll();
-        for (int i = 0; i < all.size(); i++) {
-            if (all.get(i).getEmail().equals(customer.getEmail())) {
-                all.set(i, customer);
-                customerRepository.saveAll(all);
-                return;
+        List<Customer> customers = customerRepository.findAll();
+        for (int i = 0; i < customers.size(); i++) {
+            if (customers.get(i).getId().equals(customer.getId())) {
+                customers.set(i, customer);
+                break;
             }
         }
-        throw new CustomerNotFoundException("Customer not found for update: " + customer.getEmail());
+        customerRepository.saveAll(customers);
     }
 }

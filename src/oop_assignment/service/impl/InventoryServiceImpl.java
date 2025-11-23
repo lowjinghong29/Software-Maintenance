@@ -82,4 +82,63 @@ public class InventoryServiceImpl implements InventoryService {
         }
         groceriesRepository.saveAll(allGroceries);
     }
+
+    @Override
+    public void addGrocery(Groceries grocery) {
+        if (grocery == null) {
+            throw new InvalidInputException("Grocery cannot be null");
+        }
+        List<Groceries> all = groceriesRepository.findAll();
+        // Check if already exists
+        for (Groceries g : all) {
+            if (g.getName().equals(grocery.getName())) {
+                throw new InvalidInputException("Grocery with name " + grocery.getName() + " already exists");
+            }
+        }
+        all.add(grocery);
+        groceriesRepository.saveAll(all);
+    }
+
+    @Override
+    public void removeGrocery(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new InvalidInputException("Id cannot be null or empty");
+        }
+        List<Groceries> all = groceriesRepository.findAll();
+        Groceries toRemove = null;
+        for (Groceries g : all) {
+            if (g.getName().equals(id)) {
+                toRemove = g;
+                break;
+            }
+        }
+        if (toRemove == null) {
+            throw new ProductNotFoundException("Product not found for id: " + id);
+        }
+        all.remove(toRemove);
+        groceriesRepository.saveAll(all);
+    }
+
+    @Override
+    public void increaseStock(String id, int amount) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new InvalidInputException("Id cannot be null or empty");
+        }
+        if (amount <= 0) {
+            throw new InvalidQuantityException("Amount must be > 0");
+        }
+        List<Groceries> all = groceriesRepository.findAll();
+        Groceries toUpdate = null;
+        for (Groceries g : all) {
+            if (g.getName().equals(id)) {
+                toUpdate = g;
+                break;
+            }
+        }
+        if (toUpdate == null) {
+            throw new ProductNotFoundException("Product not found for id: " + id);
+        }
+        toUpdate.setStockQuantity(toUpdate.getStockQuantity() + amount);
+        groceriesRepository.saveAll(all);
+    }
 }

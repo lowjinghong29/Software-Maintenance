@@ -1,5 +1,6 @@
 package oop_assignment.service.impl;
 
+import oop_assignment.constant.Messages;
 import oop_assignment.model.Cart;
 import oop_assignment.model.CartItem;
 import oop_assignment.model.Customer;
@@ -15,7 +16,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     @Override
     public String generateReceipt(Cart cart, PricingSummary pricingSummary, Customer customer) {
         StringBuilder sb = new StringBuilder();
-        sb.append("=== Trapstar Groceries Receipt ===\n");
+        sb.append(Messages.RECEIPT_HEADER);
         sb.append("Date/Time: ").append(LocalDateTime.now()).append("\n");
         if (customer != null) {
             sb.append("Member: ").append(customer.getName()).append(" (ID: ").append(customer.getEmail()).append(")\n");

@@ -3,7 +3,9 @@ package oop_assignment.service.impl;
 import oop_assignment.exception.AuthenticationFailedException;
 import oop_assignment.exception.InvalidInputException;
 import oop_assignment.model.Customer;
+import oop_assignment.model.Staff;
 import oop_assignment.repository.CustomerRepository;
+import oop_assignment.repository.StaffRepository;
 import oop_assignment.service.AuthService;
 import java.util.List;
 
@@ -13,12 +15,17 @@ import java.util.List;
 public class AuthServiceImpl implements AuthService {
 
     private final CustomerRepository customerRepository;
+    private final StaffRepository staffRepository;
 
-    public AuthServiceImpl(CustomerRepository customerRepository) {
+    public AuthServiceImpl(CustomerRepository customerRepository, StaffRepository staffRepository) {
         if (customerRepository == null) {
             throw new IllegalArgumentException("CustomerRepository cannot be null");
         }
+        if (staffRepository == null) {
+            throw new IllegalArgumentException("StaffRepository cannot be null");
+        }
         this.customerRepository = customerRepository;
+        this.staffRepository = staffRepository;
     }
 
     @Override
@@ -34,6 +41,20 @@ public class AuthServiceImpl implements AuthService {
                 } else {
                     throw new AuthenticationFailedException("Invalid credentials");
                 }
+            }
+        }
+        throw new AuthenticationFailedException("Invalid credentials");
+    }
+
+    @Override
+    public Staff staffLogin(String username, String password) {
+        if (username == null || username.trim().isEmpty() || password == null) {
+            throw new InvalidInputException("Invalid credentials");
+        }
+        List<Staff> all = staffRepository.findAll();
+        for (Staff s : all) {
+            if (s.getUsername().equals(username.trim()) && s.getPassword().equals(password)) {
+                return s;
             }
         }
         throw new AuthenticationFailedException("Invalid credentials");

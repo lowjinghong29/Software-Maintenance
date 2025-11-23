@@ -37,4 +37,25 @@ public interface InventoryService {
      * @param cart the cart
      */
     void decreaseStock(Cart cart);
+
+    /**
+     * Adds a new grocery item.
+     * @param grocery the grocery to add
+     */
+    void addGrocery(Groceries grocery);
+
+    /**
+     * Removes a grocery item by id.
+     * @param id the id of the grocery to remove
+     * @throws ProductNotFoundException if not found
+     */
+    void removeGrocery(String id);
+
+    /**
+     * Increases stock for a grocery item.
+     * @param id the id of the grocery
+     * @param amount the amount to add to stock
+     * @throws ProductNotFoundException if not found
+     */
+    void increaseStock(String id, int amount);
 }

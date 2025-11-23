@@ -34,22 +34,24 @@ public class FileGroceriesRepository implements GroceriesRepository {
         try {
             List<String> lines = Files.readAllLines(filePath);
             for (String line : lines) {
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-                String[] tokens = line.split("\\|");
-                if (tokens.length >= 3) {
+                if (line.trim().isEmpty()) continue;
+                String[] tokens = line.split(",");
+                String name = "";
+                double price = 0;
+                int stock = 0;
+                if (tokens.length == 3) {
+                    // name,price,stock
                     try {
-                        String name = tokens[0].trim();
-                        double price = Double.parseDouble(tokens[1].trim());
-                        int stock = Integer.parseInt(tokens[2].trim());
+                        name = tokens[0].trim();
+                        price = Double.parseDouble(tokens[1].trim());
+                        stock = Integer.parseInt(tokens[2].trim());
                         Groceries grocery = new Groceries(name, price, stock);
                         groceries.add(grocery);
                     } catch (NumberFormatException e) {
-                        logger.log(Level.WARNING, "Malformed line in groceries file: " + line, e);
+                        logger.warning("Malformed line in groceries file: " + line);
                     }
                 } else {
-                    logger.log(Level.WARNING, "Malformed line in groceries file: " + line);
+                    logger.warning("Malformed line in groceries file: " + line);
                 }
             }
         } catch (IOException e) {
@@ -62,7 +64,7 @@ public class FileGroceriesRepository implements GroceriesRepository {
     public void saveAll(List<Groceries> groceries) {
         List<String> lines = new ArrayList<>();
         for (Groceries grocery : groceries) {
-            String line = String.format("%s|%.2f|%d", grocery.getName(), grocery.getPrice(), grocery.getStockQuantity());
+            String line = String.format("%s,%.2f,%d", grocery.getName(), grocery.getPrice(), grocery.getStockQuantity());
             lines.add(line);
         }
         try {
