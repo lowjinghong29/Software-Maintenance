@@ -55,17 +55,17 @@ public class MainApplication {
         PricingService pricingService = new PricingServiceImpl();
         CustomerService customerService = new CustomerServiceImpl(customerRepository);
         CustomerAccountService customerAccountService = new CustomerAccountServiceImpl(customerRepository);
-        AuthService authService = new AuthServiceImpl(customerRepository, staffRepository);
+        AuthService authService = new AuthServiceImpl(customerRepository, staffRepository, customerService);
         QRCodeService qrCodeService = new QRCodeServiceStub();
         ReceiptService receiptService = new ReceiptServiceImpl();
         SalesService salesService = new SalesServiceImpl(salesRepository);
-        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, salesService, receiptService, qrCodeService);
+        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, customerService, salesService, receiptService, qrCodeService);
         ReportService reportService = new ReportServiceImpl(salesService);
 
         CheckoutController checkoutController = new CheckoutController(scanner, inventoryService, checkoutService, receiptService, cartRepository);
         MembershipController membershipController = new MembershipController(scanner, session, authService, customerService, customerAccountService, cartRepository);
-        ReportController reportController = new ReportController(scanner, reportService);
-        MainMenuController mainMenuController = new MainMenuController(scanner, checkoutController, membershipController, reportController, session, authService, customerService, inventoryService, cartRepository);
+        ReportController reportController = new ReportController(scanner, reportService, inventoryService);
+        MainMenuController mainMenuController = new MainMenuController(scanner, checkoutController, membershipController, reportController, session, authService, customerService, inventoryService, cartRepository, customerAccountService);
 
         mainMenuController.start();
         scanner.close();

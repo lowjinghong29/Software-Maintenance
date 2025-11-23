@@ -1,6 +1,7 @@
 package oop_assignment.service;
 
 import oop_assignment.model.Cart;
+import oop_assignment.model.Customer;
 import oop_assignment.model.PricingSummary;
 
 /**
@@ -12,8 +13,9 @@ public interface PricingService {
      * Calculates the pricing summary for the given cart and membership status.
      * @param cart the shopping cart, must not be null
      * @param isMember true if the customer is a member, false otherwise
+     * @param customer the customer, may be null for guests
      * @return the pricing summary
      * @throws IllegalArgumentException if cart is null
      */
-    PricingSummary calculate(Cart cart, boolean isMember);
+    PricingSummary calculate(Cart cart, boolean isMember, Customer customer);
 }

@@ -23,4 +23,10 @@ public interface AuthService {
      * @return the staff
      */
     Staff staffLogin(String username, String password);
+
+    /**
+     * Registers a new customer.
+     * @param customer the customer to register
+     */
+    void registerCustomer(Customer customer);
 }

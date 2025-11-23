@@ -6,7 +6,6 @@ package oop_assignment.menu;
 public enum MainMenuOption {
     STAFF(1, "Staff"),
     CUSTOMER(2, "Customer"),
-    VIEW_CART(3, "View Cart"),
     EXIT(0, "Exit System");
 
     private final int code;

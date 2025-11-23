@@ -9,9 +9,11 @@ import oop_assignment.model.Staff;
 import oop_assignment.service.AuthService;
 import oop_assignment.service.CustomerService;
 import oop_assignment.service.InventoryService;
+import oop_assignment.service.CustomerAccountService;
 import oop_assignment.util.InputUtils;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import oop_assignment.repository.CartRepository;
 import oop_assignment.model.Cart;
@@ -30,6 +32,7 @@ public class MainMenuController {
     private final CustomerService customerService;
     private final InventoryService inventoryService;
     private final CartRepository cartRepository;
+    private final CustomerAccountService customerAccountService;
 
     private static final String WELCOME_ART = "___________                             __                   ________                                .__               \n" +
 "\\__    ___/___________  ______  _______/  |______ _______   /  _____/______  ____   ____  ___________|__| ____   ______\n" +
@@ -39,7 +42,7 @@ public class MainMenuController {
 "                      \\/|__|       \\/            \\/                \\/                  \\/    \\/              \\/     \\/\n";
 
     public MainMenuController(Scanner scanner, CheckoutController checkoutController,
-                              MembershipController membershipController, ReportController reportController, Session session, AuthService authService, CustomerService customerService, InventoryService inventoryService, CartRepository cartRepository) {
+                              MembershipController membershipController, ReportController reportController, Session session, AuthService authService, CustomerService customerService, InventoryService inventoryService, CartRepository cartRepository, CustomerAccountService customerAccountService) {
         this.scanner = scanner;
         this.checkoutController = checkoutController;
         this.membershipController = membershipController;
@@ -49,6 +52,7 @@ public class MainMenuController {
         this.customerService = customerService;
         this.inventoryService = inventoryService;
         this.cartRepository = cartRepository;
+        this.customerAccountService = customerAccountService;
     }
 
     public void start() {
@@ -75,9 +79,6 @@ public class MainMenuController {
                     case CUSTOMER:
                         handleCustomer();
                         break;
-                    case VIEW_CART:
-                        handleViewCart();
-                        break;
                     case EXIT:
                         System.out.println(Messages.GOODBYE);
                         return;
@@ -100,25 +101,76 @@ public class MainMenuController {
             return;
         }
         Customer customer = session.getCurrentCustomer();
-        System.out.println("\n=== Redemption ===");
-        System.out.println("Your current points: " + customer.getLoyaltyPoints());
-        if (customer.getLoyaltyPoints() < 100) {
-            System.out.println("You need at least 100 points to redeem.");
+        while (true) {
+            System.out.println("\n=== Redemption Menu ===");
+            System.out.println("Your current points: " + customer.getLoyaltyPoints());
+            System.out.println("Points can be redeemed for discount vouchers on future purchases.");
+            System.out.println("1. Redeem 50 points for RM2 discount voucher");
+            System.out.println("2. Redeem 100 points for RM5 discount voucher");
+            System.out.println("3. Redeem 200 points for RM10 discount voucher");
+            System.out.println("4. View my discount vouchers");
+            System.out.println("0. Back to Member Services");
+            System.out.print(Messages.MAIN_MENU_PROMPT);
+            try {
+                int choice = InputUtils.readInt(scanner, "");
+                switch (choice) {
+                    case 1:
+                        redeemVoucher(customer, 50, "RM2");
+                        break;
+                    case 2:
+                        redeemVoucher(customer, 100, "RM5");
+                        break;
+                    case 3:
+                        redeemVoucher(customer, 200, "RM10");
+                        break;
+                    case 4:
+                        viewVouchers(customer);
+                        break;
+                    case 0:
+                        return;
+                    default:
+                        System.out.println(Messages.INVALID_OPTION);
+                }
+            } catch (InputMismatchException e) {
+                System.out.println(Messages.INVALID_NUMBER);
+                scanner.nextLine();
+            }
+        }
+    }
+
+    private void redeemVoucher(Customer customer, int pointsRequired, String voucherType) {
+        if (customer.getLoyaltyPoints() < pointsRequired) {
+            System.out.println("You need at least " + pointsRequired + " points to redeem this voucher. You currently have " + customer.getLoyaltyPoints() + " points.");
+            System.out.println("Earn more points by making purchases!");
             return;
         }
-        System.out.println("Redeem 100 points for RM5 discount on next purchase? (Y/N)");
+        System.out.println("Redeem " + pointsRequired + " points for " + voucherType + " discount voucher? (Y/N)");
         String confirm = scanner.nextLine().trim().toUpperCase();
         if (confirm.equals("Y")) {
-            customer.setLoyaltyPoints(customer.getLoyaltyPoints() - 100);
+            customer.setLoyaltyPoints(customer.getLoyaltyPoints() - pointsRequired);
+            Map<String, Integer> vouchers = customer.getDiscountVouchers();
+            vouchers.put(voucherType, vouchers.getOrDefault(voucherType, 0) + 1);
             try {
                 customerService.updateCustomer(customer);
-                System.out.println("Redemption successful! You have redeemed RM5 discount.");
-                System.out.println("Show this message at checkout for discount.");
+                System.out.println("Redemption successful! You have redeemed a " + voucherType + " discount voucher.");
+                System.out.println("Remaining points: " + customer.getLoyaltyPoints());
             } catch (Exception e) {
                 System.out.println("Failed to redeem: " + e.getMessage());
             }
         } else {
             System.out.println("Redemption cancelled.");
+        }
+    }
+
+    private void viewVouchers(Customer customer) {
+        Map<String, Integer> vouchers = customer.getDiscountVouchers();
+        System.out.println("\n=== Your Discount Vouchers ===");
+        if (vouchers.isEmpty()) {
+            System.out.println("You have no discount vouchers.");
+        } else {
+            for (Map.Entry<String, Integer> entry : vouchers.entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue() + " voucher(s)");
+            }
         }
     }
 
@@ -184,11 +236,12 @@ public class MainMenuController {
             if (session.hasCustomer()) {
                 // Logged in menu
                 System.out.println("\n=== Member Services ===");
-                System.out.println("Welcome back, " + session.getCurrentCustomer().getName() + "!");
-                System.out.println("1. Add to Cart");
-                System.out.println("2. Redemption");
-                System.out.println("3. Top up Wallet");
-                System.out.println("4. Logout");
+                System.out.println("Welcome back, " + session.getCurrentCustomer().getName() + " (Points: " + session.getCurrentCustomer().getLoyaltyPoints() + ")!");
+                System.out.println("1. Purchase Groceries");
+                System.out.println("2. View Cart");
+                System.out.println("3. Redemption");
+                System.out.println("4. Top up Wallet");
+                System.out.println("5. Logout");
                 System.out.println("0. Back to Main Menu");
                 System.out.print(Messages.MAIN_MENU_PROMPT);
                 try {
@@ -196,15 +249,32 @@ public class MainMenuController {
                     scanner.nextLine(); // consume newline
                     switch (choice) {
                         case 1:
-                            handleAddToCart(session.getCurrentCustomer());
+                            checkoutController.startCheckout(session.getCurrentCustomer());
                             break;
                         case 2:
-                            handleRedemption();
+                            handleViewCart();
                             break;
                         case 3:
-                            membershipController.start(); // assuming top up is in membership
+                            handleRedemption();
                             break;
                         case 4:
+                            // Direct top up
+                            Customer customer = session.getCurrentCustomer();
+                            System.out.println("Current balance: RM" + customer.getBalance());
+                            System.out.print("Enter the amount to top up (RM): ");
+                            try {
+                                double amount = Double.parseDouble(scanner.nextLine().trim());
+                                if (amount <= 0) {
+                                    System.out.println("Amount must be greater than 0.");
+                                    return;
+                                }
+                                customerAccountService.addBalance(customer, amount);
+                                System.out.println("Top-up successful! New balance: RM" + customer.getBalance());
+                            } catch (NumberFormatException e) {
+                                System.out.println("Invalid number. Please enter a valid amount.");
+                            }
+                            break;
+                        case 5:
                             session.clearCustomer();
                             System.out.println(Messages.LOGOUT_MESSAGE);
                             break;
@@ -218,11 +288,12 @@ public class MainMenuController {
                     scanner.nextLine();
                 }
             } else {
-                // Not logged in menu
+                // Not logged in
                 System.out.println("\n=== Customer Services ===");
-                System.out.println("1. Login as Member");
-                System.out.println("2. Sign up Member");
-                System.out.println("3. Add to Cart (Guest)");
+                System.out.println("Are you a member?");
+                System.out.println("1. No (Continue as Guest)");
+                System.out.println("2. Yes (Login as Member)");
+                System.out.println("3. Sign up as Member");
                 System.out.println("0. Back to Main Menu");
                 System.out.print(Messages.MAIN_MENU_PROMPT);
                 try {
@@ -230,13 +301,26 @@ public class MainMenuController {
                     scanner.nextLine(); // consume newline
                     switch (choice) {
                         case 1:
-                            membershipController.start();
+                            // Guest mode
+                            guestMode();
                             break;
                         case 2:
-                            handleSignUp();
+                            // Direct login
+                            System.out.println("\n=== Member Login ===");
+                            System.out.print("Enter member ID or email: ");
+                            String idOrEmail = scanner.nextLine().trim();
+                            System.out.print("Enter password: ");
+                            String password = scanner.nextLine().trim();
+                            try {
+                                Customer customer = authService.customerLogin(idOrEmail, password);
+                                session.setCurrentCustomer(customer);
+                                System.out.println("Login successful! Welcome, " + customer.getName() + "!");
+                            } catch (Exception e) {
+                                System.out.println("Invalid credentials. Please try again.");
+                            }
                             break;
                         case 3:
-                            handleAddToCart(null); // Pass null customer for guest cart
+                            handleSignUp();
                             break;
                         case 0:
                             return;
@@ -361,15 +445,15 @@ public class MainMenuController {
         }
         int choice = InputUtils.readInt(scanner, "Enter grocery number (or 0 to cancel): ") - 1;
         if (choice == -1) {
-            return;
+            return; // cancel
         }
         if (choice < 0 || choice >= groceries.size()) {
             System.out.println("Invalid grocery number. Please enter a number between 1 and " + groceries.size() + " (or 0 to cancel).");
             return;
         }
-        String name = groceries.get(choice).getName();
+        Groceries selected = groceries.get(choice);
         try {
-            inventoryService.removeGrocery(name);
+            inventoryService.removeGrocery(selected.getName());
             System.out.println("Grocery removed successfully!");
         } catch (Exception e) {
             System.out.println("Failed to remove grocery: " + e.getMessage());
@@ -379,7 +463,7 @@ public class MainMenuController {
     private void handleAddStock() {
         List<Groceries> groceries = inventoryService.getAllGroceries();
         if (groceries.isEmpty()) {
-            System.out.println("No groceries to add stock to.");
+            System.out.println("No groceries available. Please add groceries first.");
             return;
         }
         System.out.println("Select grocery to add stock:");
@@ -389,116 +473,189 @@ public class MainMenuController {
         }
         int choice = InputUtils.readInt(scanner, "Enter grocery number (or 0 to cancel): ") - 1;
         if (choice == -1) {
-            return;
+            return; // cancel
         }
         if (choice < 0 || choice >= groceries.size()) {
             System.out.println("Invalid grocery number. Please enter a number between 1 and " + groceries.size() + " (or 0 to cancel).");
             return;
         }
-        String name = groceries.get(choice).getName();
-        int amount = InputUtils.readInt(scanner, "Enter amount to add: ");
-        if (amount <= 0) {
-            System.out.println("Amount must be > 0.");
+        Groceries selected = groceries.get(choice);
+        int additionalStock = InputUtils.readInt(scanner, "Enter additional stock for " + selected.getName() + ": ");
+        if (additionalStock <= 0) {
+            System.out.println("Additional stock must be > 0.");
             return;
         }
+        selected.setStockQuantity(selected.getStockQuantity() + additionalStock);
         try {
-            inventoryService.increaseStock(name, amount);
-            System.out.println("Stock added successfully!");
+            inventoryService.updateGrocery(selected);
+            System.out.println("Stock updated successfully!");
         } catch (Exception e) {
-            System.out.println("Failed to add stock: " + e.getMessage());
-        }
-    }
-
-    private void handleSignUp() {
-        System.out.println("\n=== Member Sign Up ===");
-        System.out.print("Enter your name: ");
-        String name = scanner.nextLine().trim();
-        if (name.isEmpty()) {
-            System.out.println("Name cannot be empty.");
-            return;
-        }
-        System.out.print("Enter your email: ");
-        String email = scanner.nextLine().trim();
-        if (email.isEmpty()) {
-            System.out.println("Email cannot be empty.");
-            return;
-        }
-        System.out.print("Enter your password: ");
-        String password = scanner.nextLine().trim();
-        if (password.isEmpty()) {
-            System.out.println("Password cannot be empty.");
-            return;
-        }
-        System.out.print("Enter your phone number: ");
-        String phone = scanner.nextLine().trim();
-        System.out.print("Enter your mailing address: ");
-        String address = scanner.nextLine().trim();
-        try {
-            Customer newCustomer = new Customer("temp", name, password, email, phone, address, 0, 0.0);
-            Customer registered = customerService.registerCustomer(newCustomer);
-            System.out.println("\nSign up successful! Welcome, " + registered.getName() + "!");
-            System.out.println("You can now log in as a member.");
-        } catch (Exception e) {
-            System.out.println("Sign up failed: " + e.getMessage());
+            System.out.println("Failed to update stock: " + e.getMessage());
         }
     }
 
     private void handleSortGroceries() {
+        while (true) {
+            System.out.println("\n=== Sort Groceries ===");
+            System.out.println("1. Sort by Name");
+            System.out.println("2. Sort by Price");
+            System.out.println("3. Sort by Stock");
+            System.out.println("0. Back");
+            int choice = InputUtils.readInt(scanner, Messages.MAIN_MENU_PROMPT);
+            List<Groceries> groceries = inventoryService.getAllGroceries();
+            if (groceries.isEmpty()) {
+                System.out.println("No groceries available to sort.");
+                return;
+            }
+            switch (choice) {
+                case 1:
+                    groceries.sort((g1, g2) -> g1.getName().compareToIgnoreCase(g2.getName()));
+                    System.out.println("Groceries sorted by name.");
+                    break;
+                case 2:
+                    groceries.sort((g1, g2) -> Double.compare(g1.getPrice(), g2.getPrice()));
+                    System.out.println("Groceries sorted by price.");
+                    break;
+                case 3:
+                    groceries.sort((g1, g2) -> Integer.compare(g1.getStockQuantity(), g2.getStockQuantity()));
+                    System.out.println("Groceries sorted by stock.");
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println(Messages.INVALID_OPTION);
+            }
+            // Display sorted groceries
+            System.out.println("\n=== Sorted Groceries ===");
+            for (Groceries g : groceries) {
+                System.out.printf("Name: %s, Price: %.2f, Stock: %d\n", g.getName(), g.getPrice(), g.getStockQuantity());
+            }
+        }
+    }
+
+    private void guestMode() {
+        while (true) {
+            System.out.println("\n=== Guest Menu ===");
+            System.out.println("1. Purchase Groceries");
+            System.out.println("2. Browse Groceries");
+            System.out.println("3. Search Groceries");
+            System.out.println("4. View Cart");
+            System.out.println("5. Login as Member");
+            System.out.println("0. Back to Main Menu");
+            System.out.print(Messages.MAIN_MENU_PROMPT);
+            try {
+                int choice = scanner.nextInt();
+                scanner.nextLine(); // consume newline
+                switch (choice) {
+                    case 1:
+                        checkoutController.startCheckout(null);
+                        break;
+                    case 2:
+                        handleBrowseGroceries();
+                        break;
+                    case 3:
+                        handleSearchGroceries();
+                        break;
+                    case 4:
+                        handleViewCart();
+                        break;
+                    case 5:
+                        handleMemberLogin();
+                        break;
+                    case 0:
+                        return;
+                    default:
+                        System.out.println(Messages.INVALID_OPTION);
+                }
+            } catch (InputMismatchException e) {
+                System.out.println(Messages.INVALID_NUMBER);
+                scanner.nextLine();
+            }
+        }
+    }
+
+    private void handleBrowseGroceries() {
         List<Groceries> groceries = inventoryService.getAllGroceries();
         if (groceries.isEmpty()) {
-            System.out.println("No groceries to sort.");
+            System.out.println("No groceries available.");
             return;
         }
-        System.out.println("Sort groceries by:");
-        System.out.println("1. Name (A-Z)");
-        System.out.println("2. Price (Low to High)");
-        System.out.println("0. Cancel");
-        int sortChoice = InputUtils.readInt(scanner, "Enter choice: ");
-        switch (sortChoice) {
-            case 1:
-                groceries.sort((g1, g2) -> g1.getName().compareToIgnoreCase(g2.getName()));
-                System.out.println("\nGroceries sorted by name:");
-                break;
-            case 2:
-                groceries.sort((g1, g2) -> Double.compare(g1.getPrice(), g2.getPrice()));
-                System.out.println("\nGroceries sorted by price:");
-                break;
-            case 0:
-                return;
-            default:
-                System.out.println("Invalid choice.");
-                return;
+        System.out.println("\n=== Browse Groceries ===");
+        for (Groceries g : groceries) {
+            System.out.printf("Name: %s, Price: %.2f, Stock: %d\n", g.getName(), g.getPrice(), g.getStockQuantity());
         }
-        for (int i = 0; i < groceries.size(); i++) {
-            Groceries g = groceries.get(i);
-            System.out.printf("%d. %s - RM%.2f (Stock: %d)\n", i + 1, g.getName(), g.getPrice(), g.getStockQuantity());
+    }
+
+    private void handleSearchGroceries() {
+        System.out.print("Enter keyword to search: ");
+        String keyword = scanner.nextLine().trim();
+        List<Groceries> results = inventoryService.searchGroceries(keyword);
+        if (results.isEmpty()) {
+            System.out.println("No groceries found matching your search.");
+            return;
+        }
+        System.out.println("\n=== Search Results ===");
+        for (Groceries g : results) {
+            System.out.printf("Name: %s, Price: %.2f, Stock: %d\n", g.getName(), g.getPrice(), g.getStockQuantity());
+        }
+    }
+
+    private void handleMemberLogin() {
+        System.out.println("\n=== Member Login ===");
+        System.out.print("Enter member ID or email: ");
+        String idOrEmail = scanner.nextLine().trim();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine().trim();
+        try {
+            Customer customer = authService.customerLogin(idOrEmail, password);
+            session.setCurrentCustomer(customer);
+            System.out.println("Login successful! Welcome, " + customer.getName() + "!");
+        } catch (Exception e) {
+            System.out.println("Invalid credentials. Please try again.");
+        }
+    }
+
+    private void handleSignUp() {
+        System.out.println("\n=== Sign Up ===");
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Enter your email: ");
+        String email = scanner.nextLine().trim();
+        System.out.print("Enter your phone number: ");
+        String phone = scanner.nextLine().trim();
+        System.out.print("Enter your mailing address: ");
+        String address = scanner.nextLine().trim();
+        System.out.print("Set a password: ");
+        String password = scanner.nextLine().trim();
+        Customer newCustomer = new Customer("temp", name, password, email, phone, address, 0, 0.0);
+        try {
+            authService.registerCustomer(newCustomer);
+            System.out.println("Registration successful! You can now log in.");
+        } catch (Exception e) {
+            System.out.println("Registration failed: " + e.getMessage());
         }
     }
 
     private void handleViewCart() {
-        Cart cart;
-        String userId;
-        if (session.hasCustomer()) {
-            userId = session.getCurrentCustomer().getId();
-            cart = session.getCurrentCart();
-        } else {
-            userId = "guest";
-            cart = cartRepository.loadCart(userId);
-        }
+        String userId = session.hasCustomer() ? session.getCurrentCustomer().getId() : "guest";
+        Cart cart = cartRepository.loadCart(userId);
         System.out.println("\n=== Your Cart ===");
         List<CartItem> cartItems = cart.getItems();
         if (cartItems.isEmpty()) {
             System.out.println("Your cart is empty.");
         } else {
-            for (CartItem item : cartItems) {
-                System.out.printf("- %s (RM%.2f) [Qty: %d]\n", item.getItem().getName(), item.getItem().getPrice(), item.getQuantity());
+            for (int i = 0; i < cartItems.size(); i++) {
+                CartItem item = cartItems.get(i);
+                System.out.printf("%d. %s (RM%.2f) [Qty: %d] = RM%.2f%n", i + 1, item.getItem().getName(), item.getItem().getPrice(), item.getQuantity(), item.getLineTotal());
             }
-            System.out.printf("Total Quantity: %d\n", cart.getTotalQuantity());
-            System.out.printf("Subtotal: RM%.2f\n", cart.getSubtotal());
+            System.out.printf("Total Quantity: %d%n", cart.getTotalQuantity());
+            System.out.printf("Subtotal: RM%.2f%n", cart.getSubtotal());
         }
         System.out.println("===================");
         System.out.println("1. Checkout");
-        System.out.println("2. Continue Shopping");
+        System.out.println("2. Remove a specific item");
+        System.out.println("3. Clear entire cart");
+        System.out.println("4. Continue Shopping");
         System.out.print(Messages.MAIN_MENU_PROMPT);
         try {
             int choice = scanner.nextInt();
@@ -509,6 +666,33 @@ public class MainMenuController {
                     checkoutController.checkoutExistingCart(cart, customer);
                     break;
                 case 2:
+                    if (cartItems.isEmpty()) {
+                        System.out.println("Cart is empty. Nothing to remove.");
+                    } else {
+                        System.out.print("Enter the item number to remove: ");
+                        int itemNum = scanner.nextInt();
+                        scanner.nextLine();
+                        if (itemNum < 1 || itemNum > cartItems.size()) {
+                            System.out.println("Invalid item number.");
+                        } else {
+                            CartItem toRemove = cartItems.get(itemNum - 1);
+                            cart.removeItem(toRemove.getItem());
+                            cartRepository.saveCart(userId, cart);
+                            System.out.println("Item removed from cart.");
+                        }
+                    }
+                    break;
+                case 3:
+                    System.out.print("Are you sure you want to clear the entire cart? (Y/N): ");
+                    String confirm = scanner.nextLine().trim().toUpperCase();
+                    if (confirm.equals("Y")) {
+                        cartRepository.saveCart(userId, new Cart());
+                        System.out.println("Cart cleared.");
+                    } else {
+                        System.out.println("Cart not cleared.");
+                    }
+                    break;
+                case 4:
                     // Do nothing, just return to menu
                     break;
                 default:

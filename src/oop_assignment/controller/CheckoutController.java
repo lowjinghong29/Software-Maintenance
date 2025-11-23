@@ -16,6 +16,7 @@ import oop_assignment.service.InventoryService;
 import oop_assignment.service.ReceiptService;
 import oop_assignment.util.InputUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -41,7 +42,8 @@ public class CheckoutController {
     }
 
     public void startCheckout(Customer currentCustomer) {
-        Cart cart = new Cart();
+        String userId = (currentCustomer != null) ? currentCustomer.getId() : "guest";
+        Cart cart = cartRepository.loadCart(userId);
 
         while (true) {
             List<Groceries> groceries = inventoryService.getAllGroceries();
@@ -56,6 +58,20 @@ public class CheckoutController {
             if (choice == 0) {
                 if (cart.isEmpty()) {
                     System.out.println("Cart is empty. No checkout performed.");
+                    return;
+                }
+                // Show cart summary and confirm
+                System.out.println("Your Cart:");
+                for (oop_assignment.model.CartItem item : cart.getItems()) {
+                    System.out.printf("- %s x %d = RM%.2f%n", item.getItem().getName(), item.getQuantity(), item.getLineTotal());
+                }
+                System.out.printf("Subtotal: RM%.2f%n", cart.getSubtotal());
+                System.out.print("Proceed to checkout? (Y/N): ");
+                String confirm = scanner.nextLine().trim().toUpperCase();
+                if (!confirm.equals("Y")) {
+                    // Save the cart for later
+                    cartRepository.saveCart(userId, cart);
+                    System.out.println("Cart saved. You can view and checkout from the View Cart option.");
                     return;
                 }
                 // Proceed to checkout
@@ -81,6 +97,33 @@ public class CheckoutController {
 
                 cart.addItem(selectedItem, quantity);
                 System.out.println("Item added to cart.");
+                cartRepository.saveCart(userId, cart);
+            }
+        }
+
+        // Voucher selection for members
+        if (currentCustomer != null) {
+            Map<String, Integer> vouchers = currentCustomer.getDiscountVouchers();
+            if (!vouchers.isEmpty()) {
+                System.out.println("\nAvailable Discount Vouchers:");
+                List<String> voucherList = new java.util.ArrayList<>(vouchers.keySet());
+                for (int i = 0; i < voucherList.size(); i++) {
+                    String v = voucherList.get(i);
+                    System.out.println((i + 1) + ". " + v + " (" + vouchers.get(v) + " available)");
+                }
+                System.out.println("0. No voucher");
+                int voucherChoice = InputUtils.readInt(scanner, "Select a voucher to apply (or 0 for none): ");
+                if (voucherChoice > 0 && voucherChoice <= voucherList.size()) {
+                    String selectedVoucher = voucherList.get(voucherChoice - 1);
+                    if (vouchers.get(selectedVoucher) > 0) {
+                        double discount = Double.parseDouble(selectedVoucher.substring(2));
+                        currentCustomer.setDiscountAmount(discount);
+                        currentCustomer.setAppliedVoucher(selectedVoucher);
+                        System.out.println("Applied " + selectedVoucher + " discount.");
+                    } else {
+                        System.out.println("No vouchers of that type available.");
+                    }
+                }
             }
         }
 
@@ -114,6 +157,13 @@ public class CheckoutController {
             System.out.println("Checkout completed successfully!");
             String receipt = receiptService.generateReceipt(cart, result.getPricingSummary(), currentCustomer);
             System.out.println(receipt);
+            // Notify points earned
+            if (currentCustomer != null) {
+                int pointsEarned = (int) result.getPricingSummary().getGrandTotal();
+                System.out.println("You have earned " + pointsEarned + " points for this purchase!");
+            }
+            // Empty the cart after successful checkout
+            cartRepository.saveCart(userId, new Cart());
         } catch (InvalidInputException | OutOfStockException | InsufficientBalanceException e) {
             System.out.println("Checkout failed: " + e.getMessage());
         } catch (Exception e) {
@@ -157,6 +207,11 @@ public class CheckoutController {
             System.out.println("Checkout completed successfully!");
             String receipt = receiptService.generateReceipt(cart, result.getPricingSummary(), customer);
             System.out.println(receipt);
+            // Notify points earned
+            if (customer != null) {
+                int pointsEarned = (int) result.getPricingSummary().getGrandTotal();
+                System.out.println("You have earned " + pointsEarned + " points for this purchase!");
+            }
             // Empty the cart after successful checkout
             String userId = (customer != null) ? customer.getId() : "guest";
             cartRepository.saveCart(userId, new Cart());

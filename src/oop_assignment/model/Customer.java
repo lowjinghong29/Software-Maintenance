@@ -1,5 +1,7 @@
 package oop_assignment.model;
 
+import java.util.Map;
+
 /**
  * Represents a customer in the system.
  */
@@ -12,10 +14,13 @@ public class Customer {
     private String mailingAddress;
     private int loyaltyPoints;
     private double balance;
+    private double discountAmount;
+    private Map<String, Integer> discountVouchers;
+    private String appliedVoucher;
 
     // Constructors, getters, setters
 
-    public Customer(String id, String name, String password, String email, String phoneNumber, String mailingAddress, int loyaltyPoints, double balance) {
+    public Customer(String id, String name, String password, String email, String phoneNumber, String mailingAddress, int loyaltyPoints, double balance, double discountAmount) {
         this.id = id;
         this.name = name;
         this.password = password;
@@ -24,6 +29,12 @@ public class Customer {
         this.mailingAddress = mailingAddress;
         this.loyaltyPoints = loyaltyPoints;
         this.balance = balance;
+        this.discountAmount = discountAmount;
+        this.discountVouchers = new java.util.HashMap<>();
+    }
+
+    public Customer(String id, String name, String password, String email, String phoneNumber, String mailingAddress, int loyaltyPoints, double balance) {
+        this(id, name, password, email, phoneNumber, mailingAddress, loyaltyPoints, balance, 0.0);
     }
 
     public String getId() {
@@ -90,6 +101,30 @@ public class Customer {
         this.balance = balance;
     }
 
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    public Map<String, Integer> getDiscountVouchers() {
+        return discountVouchers;
+    }
+
+    public void setDiscountVouchers(Map<String, Integer> discountVouchers) {
+        this.discountVouchers = discountVouchers;
+    }
+
+    public String getAppliedVoucher() {
+        return appliedVoucher;
+    }
+
+    public void setAppliedVoucher(String appliedVoucher) {
+        this.appliedVoucher = appliedVoucher;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -111,6 +146,7 @@ public class Customer {
                 ", email='" + email + '\'' +
                 ", loyaltyPoints=" + loyaltyPoints +
                 ", balance=" + balance +
+                ", discountAmount=" + discountAmount +
                 '}';
     }
 }

@@ -7,6 +7,7 @@ import oop_assignment.model.Staff;
 import oop_assignment.repository.CustomerRepository;
 import oop_assignment.repository.StaffRepository;
 import oop_assignment.service.AuthService;
+import oop_assignment.service.CustomerService;
 import java.util.List;
 
 /**
@@ -16,16 +17,21 @@ public class AuthServiceImpl implements AuthService {
 
     private final CustomerRepository customerRepository;
     private final StaffRepository staffRepository;
+    private final CustomerService customerService;
 
-    public AuthServiceImpl(CustomerRepository customerRepository, StaffRepository staffRepository) {
+    public AuthServiceImpl(CustomerRepository customerRepository, StaffRepository staffRepository, CustomerService customerService) {
         if (customerRepository == null) {
             throw new IllegalArgumentException("CustomerRepository cannot be null");
         }
         if (staffRepository == null) {
             throw new IllegalArgumentException("StaffRepository cannot be null");
         }
+        if (customerService == null) {
+            throw new IllegalArgumentException("CustomerService cannot be null");
+        }
         this.customerRepository = customerRepository;
         this.staffRepository = staffRepository;
+        this.customerService = customerService;
     }
 
     @Override
@@ -58,5 +64,10 @@ public class AuthServiceImpl implements AuthService {
             }
         }
         throw new AuthenticationFailedException("Invalid credentials");
+    }
+
+    @Override
+    public void registerCustomer(Customer customer) {
+        customerService.registerCustomer(customer);
     }
 }

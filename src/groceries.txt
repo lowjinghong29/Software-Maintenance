@@ -1,8 +1,8 @@
-Apple,2.50,100
-Orange,3.00,85
-Milk,4.50,30
-Bread,2.00,40
-Eggs,0.50,200
-Chicken,10.00,20
-Rice,5.00,50
-Mango,6.00,20
+Apple,2.50,79
+Orange,3.00,77
+Milk,4.50,17
+Bread,2.00,28
+Eggs,0.50,190
+Chicken,10.00,10
+Rice,5.00,40
+Mango,6.00,11

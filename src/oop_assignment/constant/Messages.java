@@ -48,4 +48,11 @@ public final class Messages {
     public static final String QUANTITY_SOLD_HEADER = "\nQuantity Sold by Product:";
     public static final String NO_SALES_DATA = "  No sales data available.";
     public static final String STAFF_LOGIN_HEADER = "\nStaff Login";
+    public static final String ALREADY_LOGGED_IN = "\nYou are already logged in as %s. Please log out first if you want to change account.\n";
+    public static final String NO_MEMBER_LOGGED_IN = "\nNo member is currently logged in.\n";
+    public static final String GOODBYE_MEMBER = "\nGoodbye, %s. You have been logged out.\n";
+    public static final String LOGIN_REQUIRED_VIEW = "\nPlease log in as a member to view your wallet and points.\n";
+    public static final String MEMBER_INFO = "\nMember: %s\n";
+    public static final String LOGIN_REQUIRED_TOPUP = "\nPlease log in as a member to top up your wallet.\n";
+    public static final String AMOUNT_INVALID = "\nAmount must be greater than 0.\n";
 }

@@ -58,4 +58,17 @@ public interface InventoryService {
      * @throws ProductNotFoundException if not found
      */
     void increaseStock(String id, int amount);
+
+    /**
+     * Updates a grocery item.
+     * @param grocery the updated grocery
+     */
+    void updateGrocery(Groceries grocery);
+
+    /**
+     * Searches groceries by keyword in name.
+     * @param keyword the keyword
+     * @return list of matching groceries
+     */
+    List<Groceries> searchGroceries(String keyword);
 }

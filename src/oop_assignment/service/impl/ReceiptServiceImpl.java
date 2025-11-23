@@ -33,6 +33,9 @@ public class ReceiptServiceImpl implements ReceiptService {
             sb.append(String.format("Discount: -RM%.2f\n", pricingSummary.getDiscountAmount()));
         }
         sb.append(String.format("Grand Total: RM%.2f\n", pricingSummary.getGrandTotal()));
+        if (customer != null) {
+            sb.append(String.format("Remaining Balance: RM%.2f\n", customer.getBalance()));
+        }
         return sb.toString();
     }
 }

@@ -1,1 +1,9 @@
-C006:Mango,1;Orange,1
+C002:Chicken,1;Beef,2;Pasta,3
+C001:Bread,2;Eggs,6;Rice,1
+guest:
+C008:
+C007:Milk,1
+C006:Mango,1;Orange,1;Milk,1
+C005:Eggs,12;Pasta,2;Chicken,1
+C004:Bread,1;Milk,2;Rice,1
+C003:Orange,4;Apple,1;Mango,2
