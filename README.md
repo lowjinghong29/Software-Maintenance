@@ -1,5 +1,33 @@
 # Trapstar Groceries - From Legacy to Modern: A Refactoring Journey
 
+## Setup and Running
+
+### Prerequisites
+- Java 11 or higher
+- Maven 3.6 or higher
+
+### Running the Application
+1. Clone the repository.
+2. Navigate to the project directory.
+3. Run the following command to start the application:
+   ```
+   mvn exec:java
+   ```
+   This will compile the code, download dependencies, and run the main application.
+
+### Running Tests
+To run the JUnit tests:
+```
+mvn test
+```
+
+### Using IntelliJ IDEA
+1. Open IntelliJ IDEA.
+2. Select "File" > "Open".
+3. Navigate to the project directory and select the `pom.xml` file.
+4. IntelliJ will recognize it as a Maven project and set up the source roots automatically.
+5. To run the application, you can use the Maven tool window or run configurations.
+
 ## Introduction
 This project started as a basic console-based grocery shopping app, but the original code was messy, hard to maintain, and full of bugs. Over time, we refactored it step-by-step into a clean, professional system using best practices. This README tells the story of that transformation, showing exactly what we changed and why.
 
