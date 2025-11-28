@@ -5,12 +5,14 @@ import oop_assignment.model.Cart;
 import oop_assignment.model.Groceries;
 import oop_assignment.model.PricingSummary;
 import oop_assignment.service.PricingService;
+import oop_assignment.model.Customer;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PricingServiceImplTest {
 
     private final PricingService pricingService = new PricingServiceImpl();
+    Customer customer = new Customer("C010","John", "pass123", "john@example.com", "123", "Addr", 100, 100.00);
 
     @Test
     void testCalculate_NonMember_WithItems() {
@@ -20,7 +22,7 @@ class PricingServiceImplTest {
         cart.addItem(item1, 2);
         cart.addItem(item2, 1);
 
-        PricingSummary summary = pricingService.calculate(cart, false);
+        PricingSummary summary = pricingService.calculate(cart, false,customer);
 
         assertEquals(20.00, summary.getSubtotal(), 0.01);
         assertEquals(20.00 * SystemConstants.TAX_RATE, summary.getTaxAmount(), 0.01);
@@ -36,7 +38,7 @@ class PricingServiceImplTest {
         Groceries item = new Groceries("Apple", 10.00, 10);
         cart.addItem(item, 1);
 
-        PricingSummary summary = pricingService.calculate(cart, true);
+        PricingSummary summary = pricingService.calculate(cart, true,customer);
 
         assertEquals(10.00, summary.getSubtotal(), 0.01);
         assertEquals(SystemConstants.DELIVERY_FEE_MEMBER, summary.getDeliveryFee(), 0.01);
@@ -44,6 +46,6 @@ class PricingServiceImplTest {
 
     @Test
     void testCalculate_NullCart_ThrowsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> pricingService.calculate(null, false));
+        assertThrows(IllegalArgumentException.class, () -> pricingService.calculate(null, false,customer));
     }
 }

@@ -1,5 +1,8 @@
 package oop_assignment.service.impl;
 
+import oop_assignment.model.Cart;
+import oop_assignment.model.Customer;
+import oop_assignment.model.PricingSummary;
 import oop_assignment.service.ReportService;
 import oop_assignment.service.SalesService;
 import org.junit.jupiter.api.Test;

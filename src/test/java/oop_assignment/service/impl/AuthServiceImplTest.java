@@ -3,7 +3,13 @@ package oop_assignment.service.impl;
 import oop_assignment.exception.AuthenticationFailedException;
 import oop_assignment.model.Customer;
 import oop_assignment.repository.CustomerRepository;
+import oop_assignment.repository.GroceriesRepository;
+import oop_assignment.repository.SalesRepository;
 import oop_assignment.repository.StaffRepository;
+import oop_assignment.repository.file.FileCustomerRepository;
+import oop_assignment.repository.file.FileGroceriesRepository;
+import oop_assignment.repository.file.FileSalesRepository;
+import oop_assignment.repository.file.FileStaffRepository;
 import oop_assignment.service.AuthService;
 import oop_assignment.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,14 +23,15 @@ class AuthServiceImplTest {
 
     private AuthService authService;
     private InMemoryCustomerRepository repository;
-    private CustomerService custService;
-    private StaffRepository staffRepository;
+
 
 
     @BeforeEach
     void setUp() {
         repository = new InMemoryCustomerRepository();
-        authService = new AuthServiceImpl(repository,staffRepository,custService);
+        CustomerService customerService = new CustomerServiceImpl(repository);
+        StaffRepository staffRepository = new FileStaffRepository("src/staff.txt");
+        authService = new AuthServiceImpl(repository,staffRepository,customerService);
     }
 
     @Test

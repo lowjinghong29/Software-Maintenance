@@ -4,14 +4,18 @@ import oop_assignment.exception.InvalidInputException;
 import oop_assignment.exception.InsufficientBalanceException;
 import oop_assignment.menu.PaymentMethod;
 import oop_assignment.model.*;
+import oop_assignment.repository.CustomerRepository;
+import oop_assignment.repository.file.FileCustomerRepository;
 import oop_assignment.service.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Map;
+import oop_assignment.service.CustomerService;
 
 class CheckoutServiceImplTest {
-
+    CustomerRepository customerRepository = new FileCustomerRepository("src/membership.txt");
+    CustomerService stubCust = new CustomerServiceImpl(customerRepository);
     @Test
     void testCheckout_Guest_QRPayment_Success() {
         Cart cart = new Cart();
@@ -20,12 +24,13 @@ class CheckoutServiceImplTest {
 
         StubPricingService pricingService = new StubPricingService();
         StubInventoryService inventoryService = new StubInventoryService();
+
         StubCustomerAccountService customerAccountService = new StubCustomerAccountService();
         StubSalesService salesService = new StubSalesService();
         StubReceiptService receiptService = new StubReceiptService();
         StubQRCodeService qrCodeService = new StubQRCodeService();
 
-        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, salesService, receiptService, qrCodeService);
+        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService,stubCust, salesService, receiptService, qrCodeService);
 
         CheckoutResult result = checkoutService.checkout(cart, null, false, PaymentMethod.QR_PAYMENT);
 
@@ -51,7 +56,7 @@ class CheckoutServiceImplTest {
         StubReceiptService receiptService = new StubReceiptService();
         StubQRCodeService qrCodeService = new StubQRCodeService();
 
-        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, salesService, receiptService, qrCodeService);
+        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService,stubCust, salesService, receiptService, qrCodeService);
 
         CheckoutResult result = checkoutService.checkout(cart, customer, true, PaymentMethod.MEMBER_BALANCE);
 
@@ -75,7 +80,7 @@ class CheckoutServiceImplTest {
         StubReceiptService receiptService = new StubReceiptService();
         StubQRCodeService qrCodeService = new StubQRCodeService();
 
-        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, salesService, receiptService, qrCodeService);
+        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, stubCust,salesService, receiptService, qrCodeService);
 
         assertThrows(InsufficientBalanceException.class, () -> checkoutService.checkout(cart, customer, true, PaymentMethod.MEMBER_BALANCE));
         assertFalse(inventoryService.decreaseStockCalled);
@@ -93,7 +98,7 @@ class CheckoutServiceImplTest {
         StubReceiptService receiptService = new StubReceiptService();
         StubQRCodeService qrCodeService = new StubQRCodeService();
 
-        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, salesService, receiptService, qrCodeService);
+        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, stubCust,salesService, receiptService, qrCodeService);
 
         assertThrows(InvalidInputException.class, () -> checkoutService.checkout(cart, null, false, PaymentMethod.QR_PAYMENT));
     }
@@ -111,7 +116,7 @@ class CheckoutServiceImplTest {
         StubReceiptService receiptService = new StubReceiptService();
         StubQRCodeService qrCodeService = new StubQRCodeService();
 
-        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, salesService, receiptService, qrCodeService);
+        CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, stubCust,salesService, receiptService, qrCodeService);
 
         assertThrows(InvalidInputException.class, () -> checkoutService.checkout(cart, null, true, PaymentMethod.MEMBER_BALANCE));
     }
@@ -119,7 +124,7 @@ class CheckoutServiceImplTest {
     // Stub classes
     private static class StubPricingService implements PricingService {
         @Override
-        public PricingSummary calculate(Cart cart, boolean isMember) {
+        public PricingSummary calculate(Cart cart, boolean isMember,Customer customer) {
             double subtotal = cart.getSubtotal();
             double tax = subtotal * 0.06;
             double delivery = isMember ? 0.0 : 4.90;
@@ -148,6 +153,31 @@ class CheckoutServiceImplTest {
         @Override
         public void decreaseStock(Cart cart) {
             decreaseStockCalled = true;
+        }
+
+        @Override
+        public void addGrocery(Groceries grocery) {
+
+        }
+
+        @Override
+        public void removeGrocery(String id) {
+
+        }
+
+        @Override
+        public void increaseStock(String id, int amount) {
+
+        }
+
+        @Override
+        public void updateGrocery(Groceries grocery) {
+
+        }
+
+        @Override
+        public List<Groceries> searchGroceries(String keyword) {
+            return List.of();
         }
     }
 

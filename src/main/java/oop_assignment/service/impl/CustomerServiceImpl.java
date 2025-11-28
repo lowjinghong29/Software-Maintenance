@@ -11,7 +11,12 @@ import java.util.List;
  */
 public class CustomerServiceImpl implements CustomerService {
 
-    private final CustomerRepository customerRepository;
+    private  CustomerRepository customerRepository=null;
+
+    public CustomerServiceImpl()
+    {
+
+    }
 
     public CustomerServiceImpl(CustomerRepository customerRepository) {
         if (customerRepository == null) {
