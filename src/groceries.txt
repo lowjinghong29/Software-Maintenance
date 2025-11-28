@@ -5,4 +5,4 @@ Bread,2.00,28
 Eggs,0.50,190
 Chicken,10.00,10
 Rice,5.00,40
-Mango,6.00,11
+Mango,6.00,7

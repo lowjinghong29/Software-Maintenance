@@ -6,3 +6,4 @@ C005,Charlie Brown,password111,charlie@email.com,019-5678901,202 Oak St,40,160.0
 C006,Low Jing Hong,123321,jinghong@gmail.com,0124859965,52000 Kepong,0,1010.00
 C007,Shek Jun Yi,12345,junyi@gmail.com,0123950049,Seremban,0,101.00
 C008,Seow Theng Feng,1234,feng@gmail.com,0135944485,Gombak,64,1755.11
+C009,loo,123,1@gmail,123456,35 jalan 21/34,25,18.56

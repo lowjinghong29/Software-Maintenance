@@ -9,6 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class CustomerAccountServiceImplTest {
 
     private CustomerAccountService customerAccountService;
@@ -22,7 +25,7 @@ class CustomerAccountServiceImplTest {
 
     @Test
     void testHasEnoughBalance_TrueAndFalse() {
-        Customer customer = new Customer("John", "pass", "john@example.com", "123", "Addr", 100, 100.00);
+        Customer customer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 100.00);
         repository.addCustomer(customer);
 
         assertTrue(customerAccountService.hasEnoughBalance(customer, 50.00));
@@ -31,7 +34,7 @@ class CustomerAccountServiceImplTest {
 
     @Test
     void testDebitBalance_SufficientBalance_UpdatesAndPersists() {
-        Customer customer = new Customer("John", "pass", "john@example.com", "123", "Addr", 100, 100.00);
+        Customer customer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 100.00);
         repository.addCustomer(customer);
 
         customerAccountService.debitBalance(customer, 40.00);
@@ -43,7 +46,7 @@ class CustomerAccountServiceImplTest {
 
     @Test
     void testDebitBalance_Insufficient_ThrowsInsufficientBalanceException() {
-        Customer customer = new Customer("John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
+        Customer customer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
         repository.addCustomer(customer);
 
         assertThrows(InsufficientBalanceException.class, () -> customerAccountService.debitBalance(customer, 100.00));
@@ -51,7 +54,7 @@ class CustomerAccountServiceImplTest {
 
     @Test
     void testAddBalance_PositiveAmount_IncreasesBalanceAndPersists() {
-        Customer customer = new Customer("John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
+        Customer customer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
         repository.addCustomer(customer);
 
         customerAccountService.addBalance(customer, 25.00);
@@ -63,7 +66,7 @@ class CustomerAccountServiceImplTest {
 
     @Test
     void testAddBalance_NonPositiveAmount_ThrowsInvalidInputException() {
-        Customer customer = new Customer("John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
+        Customer customer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
         repository.addCustomer(customer);
 
         assertThrows(InvalidInputException.class, () -> customerAccountService.addBalance(customer, 0));
@@ -72,7 +75,7 @@ class CustomerAccountServiceImplTest {
 
     @Test
     void testAddPoints_AddsPointsAndPersists() {
-        Customer customer = new Customer("John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
+        Customer customer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
         repository.addCustomer(customer);
 
         customerAccountService.addPoints(customer, 50);

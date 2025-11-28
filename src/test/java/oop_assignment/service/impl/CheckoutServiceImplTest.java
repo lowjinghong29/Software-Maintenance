@@ -7,6 +7,8 @@ import oop_assignment.model.*;
 import oop_assignment.service.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+import java.util.Map;
 
 class CheckoutServiceImplTest {
 
@@ -39,7 +41,7 @@ class CheckoutServiceImplTest {
         Cart cart = new Cart();
         Groceries item = new Groceries("Apple", 10.00, 10);
         cart.addItem(item, 1);
-        Customer customer = new Customer("John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
+        Customer customer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
 
         StubPricingService pricingService = new StubPricingService();
         StubInventoryService inventoryService = new StubInventoryService();
@@ -63,7 +65,7 @@ class CheckoutServiceImplTest {
         Cart cart = new Cart();
         Groceries item = new Groceries("Apple", 10.00, 10);
         cart.addItem(item, 1);
-        Customer customer = new Customer("John", "pass", "john@example.com", "123", "Addr", 100, 10.00);
+        Customer customer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 10.00);
 
         StubPricingService pricingService = new StubPricingService();
         StubInventoryService inventoryService = new StubInventoryService();

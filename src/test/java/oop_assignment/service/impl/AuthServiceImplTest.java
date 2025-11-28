@@ -3,25 +3,33 @@ package oop_assignment.service.impl;
 import oop_assignment.exception.AuthenticationFailedException;
 import oop_assignment.model.Customer;
 import oop_assignment.repository.CustomerRepository;
+import oop_assignment.repository.StaffRepository;
 import oop_assignment.service.AuthService;
+import oop_assignment.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class AuthServiceImplTest {
 
     private AuthService authService;
     private InMemoryCustomerRepository repository;
+    private CustomerService custService;
+    private StaffRepository staffRepository;
+
 
     @BeforeEach
     void setUp() {
         repository = new InMemoryCustomerRepository();
-        authService = new AuthServiceImpl(repository);
+        authService = new AuthServiceImpl(repository,staffRepository,custService);
     }
 
     @Test
     void testCustomerLogin_ValidCredentials_ReturnsCustomer() {
-        Customer customer = new Customer("John", "pass123", "john@example.com", "123", "Addr", 100, 100.00);
+        Customer customer = new Customer("C010","John", "pass123", "john@example.com", "123", "Addr", 100, 100.00);
         repository.addCustomer(customer);
 
         Customer loggedIn = authService.customerLogin("john@example.com", "pass123");
@@ -36,7 +44,7 @@ class AuthServiceImplTest {
 
     @Test
     void testCustomerLogin_InvalidPassword_ThrowsAuthenticationFailedException() {
-        Customer customer = new Customer("John", "pass123", "john@example.com", "123", "Addr", 100, 100.00);
+        Customer customer = new Customer("C010","John", "pass123", "john@example.com", "123", "Addr", 100, 100.00);
         repository.addCustomer(customer);
 
         assertThrows(AuthenticationFailedException.class, () -> authService.customerLogin("john@example.com", "wrongpass"));
