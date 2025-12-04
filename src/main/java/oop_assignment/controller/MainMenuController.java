@@ -95,7 +95,7 @@ public class MainMenuController {
         }
     }
 
-    private void handleRedemption() {
+    public void handleRedemption() {
         if (!session.hasCustomer()) {
             System.out.println("\nPlease log in as a member to redeem points.");
             return;
@@ -231,7 +231,7 @@ public class MainMenuController {
         }
     }
 
-    private void handleCustomer() {
+    public void handleCustomer() {
         while (true) {
             if (session.hasCustomer()) {
                 // Logged in menu
@@ -533,7 +533,7 @@ public class MainMenuController {
         }
     }
 
-    private void guestMode() {
+    public void guestMode() {
         while (true) {
             System.out.println("\n=== Guest Menu ===");
             System.out.println("1. Purchase Groceries");
@@ -636,7 +636,7 @@ public class MainMenuController {
         }
     }
 
-    private void handleViewCart() {
+    public void handleViewCart() {
         String userId = session.hasCustomer() ? session.getCurrentCustomer().getId() : "guest";
         Cart cart = cartRepository.loadCart(userId);
         System.out.println("\n=== Your Cart ===");
@@ -704,43 +704,4 @@ public class MainMenuController {
         }
     }
 
-    private void handleAddToCart(Customer customer) {
-        List<Groceries> groceries = inventoryService.getAllGroceries();
-        if (groceries.isEmpty()) {
-            System.out.println("No groceries available.");
-            return;
-        }
-        System.out.println("Select a grocery to add to cart:");
-        for (int i = 0; i < groceries.size(); i++) {
-            Groceries g = groceries.get(i);
-            System.out.printf("%d. %s - RM%.2f (Stock: %d)\n", i + 1, g.getName(), g.getPrice(), g.getStockQuantity());
-        }
-        int choice = InputUtils.readInt(scanner, "Enter grocery number (or 0 to cancel): ") - 1;
-        if (choice == -1) {
-            return;
-        }
-        if (choice < 0 || choice >= groceries.size()) {
-            System.out.println("Invalid grocery number. Please enter a number between 1 and " + groceries.size() + " (or 0 to cancel).");
-            return;
-        }
-        Groceries selected = groceries.get(choice);
-        int quantity = InputUtils.readInt(scanner, "Enter quantity: ");
-        if (quantity <= 0) {
-            System.out.println("Quantity must be > 0.");
-            return;
-        }
-        if (quantity > selected.getStockQuantity()) {
-            System.out.println("Not enough stock available.");
-            return;
-        }
-        // Add to cart
-        String userId = (customer != null) ? customer.getId() : "guest";
-        Cart cart = cartRepository.loadCart(userId);
-        cart.addItem(selected, quantity);
-        cartRepository.saveCart(userId, cart);
-        if (customer != null) {
-            session.setCurrentCart(cart);
-        }
-        System.out.println("Added to cart successfully!");
-    }
 }

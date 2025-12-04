@@ -1,4 +1,4 @@
-Apple,2.50,79
+Apple,2.50,75
 Orange,3.00,76
 Milk,4.50,17
 Bread,2.00,28
