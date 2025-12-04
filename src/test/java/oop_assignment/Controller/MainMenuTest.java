@@ -2,6 +2,7 @@ package oop_assignment.Controller;
 
 import oop_assignment.controller.CheckoutController;
 import oop_assignment.controller.MainMenuController;
+import oop_assignment.controller.ReportController;
 import oop_assignment.model.*;
 import oop_assignment.repository.*;
 import oop_assignment.repository.file.*;
@@ -41,6 +42,8 @@ public class MainMenuTest {
     private SalesService salesService;
     private QRCodeService qrCodeService;
     private SalesRepository salesRepository;
+    private ReportController reportController;
+    private ReportService reportService;
 
     @BeforeEach
     void setUp() {
@@ -58,12 +61,14 @@ public class MainMenuTest {
         salesRepository = new FileSalesRepository("src/sales.txt");
         salesService = new SalesServiceImpl(salesRepository);
         qrCodeService = new QRCodeServiceStub();
+        reportService= new ReportServiceImpl(salesService);
         checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService,
                 customerService, salesService, receiptService, qrCodeService);
 
         // For tests, scanner input will be provided per test, so just create a dummy scanner
         checkoutController = new CheckoutController(new Scanner(""), inventoryService, checkoutService,
                 receiptService, cartRepository);
+        reportController = new ReportController(new Scanner(""),reportService,inventoryService);
     }
 
     @BeforeEach
@@ -78,7 +83,7 @@ public class MainMenuTest {
                 "Eggs,0.50,190",
                 "Chicken,10.00,10",
                 "Rice,5.00,40",
-                "Mango,6.00,6"
+                "Mango,6.00,26"
         );
         Files.write(groceriesPath, groceriesContent, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
@@ -192,7 +197,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -231,11 +236,11 @@ public class MainMenuTest {
                 new Scanner(in),
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
-                null,
+                inventoryService,
                 cartRepository,
                 customerAccountService
         );
@@ -264,11 +269,11 @@ public class MainMenuTest {
                 new Scanner(in),
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
-                null,
+                inventoryService,
                 cartRepository,
                 customerAccountService
         );
@@ -302,7 +307,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -337,7 +342,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -376,7 +381,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -413,7 +418,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -451,7 +456,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -481,11 +486,11 @@ public class MainMenuTest {
                 new Scanner(in),
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
-                null,
+                inventoryService,
                 cartRepository,
                 customerAccountService
         );
@@ -522,7 +527,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -566,7 +571,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -603,7 +608,7 @@ public class MainMenuTest {
                 scanner,
                 checkoutController,
                 null,
-                null,
+                reportController,
                 session,
                 authService,
                 customerService,
@@ -623,5 +628,74 @@ public class MainMenuTest {
 
         assertFalse(exists, "Mango should have been removed");
 
+    }
+
+    @Test
+    void testAddStock() {
+        String input = String.join("\n",
+                "1",//staff login
+                "admin", //username
+                "admin", // password
+                "3",//addstock
+                "8",//mango
+                "-4",// negative quantity,
+                "3",
+                "8",
+                "a",// alphabet input for quantity
+                "10"
+        ) + "\n";
+
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        Scanner scanner = new Scanner(in);
+
+        MainMenuController controller = new MainMenuController(
+                scanner,
+                checkoutController,
+                null,
+                reportController,
+                session,
+                authService,
+                customerService,
+                inventoryService,
+                cartRepository,
+                customerAccountService
+        );
+
+        controller.start();
+
+        // assert quantity changed
+        List<Groceries> finalList = groceriesRepository.findAll();
+        // check if mango is added correctly
+        assertEquals(36, finalList.get(finalList.size()-1).getStockQuantity());
+    }
+
+    @Test
+    void testReport() {
+        String input = String.join("\n",
+                "1",//staff login
+                "admin", //username
+                "admin", // password
+                "4",//report
+                "1",//get total revenue
+                "2"//pie chart
+        ) + "\n";
+
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        Scanner scanner = new Scanner(in);
+        reportController = new ReportController(scanner, reportService, inventoryService);
+        MainMenuController controller = new MainMenuController(
+                scanner,
+                checkoutController,
+                null,
+                reportController,
+                session,
+                authService,
+                customerService,
+                inventoryService,
+                cartRepository,
+                customerAccountService
+        );
+
+        controller.start();
     }
 }

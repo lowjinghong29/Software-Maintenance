@@ -2,6 +2,7 @@ package oop_assignment.controller;
 
 import oop_assignment.constant.Messages;
 import oop_assignment.menu.MainMenuOption;
+import oop_assignment.menu.*;
 import oop_assignment.model.Customer;
 import oop_assignment.model.Groceries;
 import oop_assignment.model.Session;
@@ -103,35 +104,34 @@ public class MainMenuController {
         Customer customer = session.getCurrentCustomer();
         while (true) {
             System.out.println("\n=== Redemption Menu ===");
-            System.out.println("Your current points: " + customer.getLoyaltyPoints());
-            System.out.println("Points can be redeemed for discount vouchers on future purchases.");
-            System.out.println("1. Redeem 50 points for RM2 discount voucher");
-            System.out.println("2. Redeem 100 points for RM5 discount voucher");
-            System.out.println("3. Redeem 200 points for RM10 discount voucher");
-            System.out.println("4. View my discount vouchers");
-            System.out.println("0. Back to Member Services");
+            for (RedemptionMenuOption option : RedemptionMenuOption.values()) {
+                System.out.println(option);
+            }
             System.out.print(Messages.MAIN_MENU_PROMPT);
             try {
                 int choice = InputUtils.readInt(scanner, "");
-                switch (choice) {
-                    case 1:
+                RedemptionMenuOption option = RedemptionMenuOption.fromCode(choice);
+                switch (option) {
+                    case REDEEM_50:
                         redeemVoucher(customer, 50, "RM2");
                         break;
-                    case 2:
+                    case REDEEM_100:
                         redeemVoucher(customer, 100, "RM5");
                         break;
-                    case 3:
+                    case REDEEM_200:
                         redeemVoucher(customer, 200, "RM10");
                         break;
-                    case 4:
+                    case VIEW_VOUCHERS:
                         viewVouchers(customer);
                         break;
-                    case 0:
+                    case BACK :
                         return;
-                    default:
-                        System.out.println(Messages.INVALID_OPTION);
                 }
-            } catch (InputMismatchException e) {
+
+            } catch (IllegalArgumentException e) {
+                System.out.println(Messages.INVALID_OPTION);
+                scanner.nextLine();
+            }catch (InputMismatchException e) {
                 System.out.println(Messages.INVALID_NUMBER);
                 scanner.nextLine();
             }
@@ -193,38 +193,39 @@ public class MainMenuController {
     private void showStaffMenu() {
         while (true) {
             System.out.println(Messages.STAFF_MENU_HEADER);
-            System.out.println("1. Modify Customer Details");
-            System.out.println("2. Add/Remove Groceries");
-            System.out.println("3. Add Stock");
-            System.out.println("4. Generate Report");
-            System.out.println("5. Sort Groceries");
-            System.out.println("0. Logout");
+            for (StaffMenu option : StaffMenu.values()) {
+                System.out.println(option); // calls option.toString()
+            }
             System.out.print(Messages.MAIN_MENU_PROMPT);
             try {
-                int choice = scanner.nextInt();
+                int code = scanner.nextInt();
                 scanner.nextLine();
+                StaffMenu choice = StaffMenu.fromCode(code);
                 switch (choice) {
-                    case 1:
+                    case MODIFY_CUSTOMER:
                         handleModifyCustomer();
                         break;
-                    case 2:
+                    case ADD_REMOVE_GROCERIES:
                         handleAddRemoveGroceries();
                         break;
-                    case 3:
+                    case ADD_STOCK:
                         handleAddStock();
                         break;
-                    case 4:
+                    case GENERATE_REPORT:
                         reportController.start();
                         break;
-                    case 5:
+                    case SORT_GROCERIES:
                         handleSortGroceries();
                         break;
-                    case 0:
+                    case LOGOUT:
                         return;
                     default:
                         System.out.println(Messages.INVALID_OPTION);
                 }
-            } catch (InputMismatchException e) {
+            }catch (IllegalArgumentException e) {
+                System.out.println(Messages.INVALID_OPTION);
+            }
+            catch (InputMismatchException e) {
                 System.out.println(Messages.INVALID_NUMBER);
                 scanner.nextLine();
             }
@@ -237,27 +238,31 @@ public class MainMenuController {
                 // Logged in menu
                 System.out.println("\n=== Member Services ===");
                 System.out.println("Welcome back, " + session.getCurrentCustomer().getName() + " (Points: " + session.getCurrentCustomer().getLoyaltyPoints() + ")!");
-                System.out.println("1. Purchase Groceries");
-                System.out.println("2. View Cart");
-                System.out.println("3. Redemption");
-                System.out.println("4. Top up Wallet");
-                System.out.println("5. Logout");
-                System.out.println("0. Back to Main Menu");
+                for (CustomerMenuOption option : new CustomerMenuOption[]{
+                        CustomerMenuOption.PURCHASE_GROCERIES,
+                        CustomerMenuOption.VIEW_CART,
+                        CustomerMenuOption.REDEMPTION,
+                        CustomerMenuOption.TOP_UP,
+                        CustomerMenuOption.LOGOUT,
+                        CustomerMenuOption.BACK}) {
+                    System.out.println(option);
+                }
                 System.out.print(Messages.MAIN_MENU_PROMPT);
                 try {
                     int choice = scanner.nextInt();
                     scanner.nextLine(); // consume newline
-                    switch (choice) {
-                        case 1:
+                    CustomerMenuOption option = CustomerMenuOption.fromCode(choice);
+                    switch (option) {
+                        case PURCHASE_GROCERIES:
                             checkoutController.startCheckout(session.getCurrentCustomer());
                             break;
-                        case 2:
+                        case VIEW_CART:
                             handleViewCart();
                             break;
-                        case 3:
+                        case REDEMPTION:
                             handleRedemption();
                             break;
-                        case 4:
+                        case TOP_UP:
                             // Direct top up
                             Customer customer = session.getCurrentCustomer();
                             System.out.println("Current balance: RM" + customer.getBalance());
@@ -274,16 +279,18 @@ public class MainMenuController {
                                 System.out.println("Invalid number. Please enter a valid amount.");
                             }
                             break;
-                        case 5:
+                        case LOGOUT:
                             session.clearCustomer();
                             System.out.println(Messages.LOGOUT_MESSAGE);
                             break;
-                        case 0:
+                        case BACK:
                             return;
                         default:
                             System.out.println(Messages.INVALID_OPTION);
                     }
-                } catch (InputMismatchException e) {
+                } catch (IllegalArgumentException e) {
+                    System.out.println(Messages.INVALID_OPTION);
+                }catch (InputMismatchException e) {
                     System.out.println(Messages.INVALID_NUMBER);
                     scanner.nextLine();
                 }
@@ -291,20 +298,24 @@ public class MainMenuController {
                 // Not logged in
                 System.out.println("\n=== Customer Services ===");
                 System.out.println("Are you a member?");
-                System.out.println("1. No (Continue as Guest)");
-                System.out.println("2. Yes (Login as Member)");
-                System.out.println("3. Sign up as Member");
-                System.out.println("0. Back to Main Menu");
+                for (CustomerMenuOption option : new CustomerMenuOption[]{
+                        CustomerMenuOption.GUEST,
+                        CustomerMenuOption.LOGIN,
+                        CustomerMenuOption.SIGN_UP,
+                        CustomerMenuOption.BACK }) {
+                    System.out.println(option);
+                }
                 System.out.print(Messages.MAIN_MENU_PROMPT);
                 try {
                     int choice = scanner.nextInt();
                     scanner.nextLine(); // consume newline
-                    switch (choice) {
-                        case 1:
+                    CustomerMenuOption option = CustomerMenuOption.fromCode(choice);
+                    switch (option) {
+                        case GUEST:
                             // Guest mode
                             guestMode();
                             break;
-                        case 2:
+                        case LOGIN:
                             // Direct login
                             System.out.println("\n=== Member Login ===");
                             System.out.print("Enter member ID or email: ");
@@ -319,15 +330,17 @@ public class MainMenuController {
                                 System.out.println("Invalid credentials. Please try again.");
                             }
                             break;
-                        case 3:
+                        case SIGN_UP:
                             handleSignUp();
                             break;
-                        case 0:
+                        case BACK:
                             return;
                         default:
                             System.out.println(Messages.INVALID_OPTION);
                     }
-                } catch (InputMismatchException e) {
+                } catch (IllegalArgumentException e) {
+                    System.out.println(Messages.INVALID_OPTION);
+                }catch (InputMismatchException e) {
                     System.out.println(Messages.INVALID_NUMBER);
                     scanner.nextLine();
                 }
@@ -387,21 +400,28 @@ public class MainMenuController {
     private void handleAddRemoveGroceries() {
         while (true) {
             System.out.println("\n=== Add/Remove Groceries ===");
-            System.out.println("1. Add Grocery");
-            System.out.println("2. Remove Grocery");
-            System.out.println("0. Back");
+            for (AddRemoveGroceriesOption option : AddRemoveGroceriesOption.values()) {
+                System.out.println(option);
+            }
+            try {
             int choice = InputUtils.readInt(scanner, Messages.MAIN_MENU_PROMPT);
-            switch (choice) {
-                case 1:
+            AddRemoveGroceriesOption option = AddRemoveGroceriesOption.fromCode(choice);
+            switch (option) {
+                case ADD_GROCERY:
                     handleAddGrocery();
                     break;
-                case 2:
+                case REMOVE_GROCERY:
                     handleRemoveGrocery();
                     break;
-                case 0:
+                case BACK:
                     return;
-                default:
-                    System.out.println(Messages.INVALID_OPTION);
+            }
+            } catch (IllegalArgumentException e) {
+                System.out.println(Messages.INVALID_OPTION);
+            } catch (InputMismatchException e)
+            {
+                System.out.println(Messages.INVALID_NUMBER);
+                scanner.nextLine();
             }
         }
     }
@@ -536,33 +556,31 @@ public class MainMenuController {
     public void guestMode() {
         while (true) {
             System.out.println("\n=== Guest Menu ===");
-            System.out.println("1. Purchase Groceries");
-            System.out.println("2. Browse Groceries");
-            System.out.println("3. Search Groceries");
-            System.out.println("4. View Cart");
-            System.out.println("5. Login as Member");
-            System.out.println("0. Back to Main Menu");
+            for (GuestMenuOption option : GuestMenuOption.values()) {
+                System.out.println(option);
+            }
             System.out.print(Messages.MAIN_MENU_PROMPT);
             try {
                 int choice = scanner.nextInt();
                 scanner.nextLine(); // consume newline
-                switch (choice) {
-                    case 1:
+                GuestMenuOption option = GuestMenuOption.fromCode(choice);
+                switch (option) {
+                    case PURCHASE_GROCERIES:
                         checkoutController.startCheckout(null);
                         break;
-                    case 2:
+                    case BROWSE_GROCERIES:
                         handleBrowseGroceries();
                         break;
-                    case 3:
+                    case SEARCH_GROCERIES:
                         handleSearchGroceries();
                         break;
-                    case 4:
+                    case VIEW_CART:
                         handleViewCart();
                         break;
-                    case 5:
+                    case LOGIN_MEMBER:
                         handleMemberLogin();
                         break;
-                    case 0:
+                    case BACK:
                         return;
                     default:
                         System.out.println(Messages.INVALID_OPTION);
@@ -652,20 +670,20 @@ public class MainMenuController {
             System.out.printf("Subtotal: RM%.2f%n", cart.getSubtotal());
         }
         System.out.println("===================");
-        System.out.println("1. Checkout");
-        System.out.println("2. Remove a specific item");
-        System.out.println("3. Clear entire cart");
-        System.out.println("4. Continue Shopping");
+        for (CartMenu option : CartMenu.values()) {
+            System.out.println(option); // calls option.toString()
+        }
         System.out.print(Messages.MAIN_MENU_PROMPT);
         try {
             int choice = scanner.nextInt();
             scanner.nextLine(); // consume newline
-            switch (choice) {
-                case 1:
+            CartMenu option = CartMenu.fromCode(choice);
+            switch (option) {
+                case CHECKOUT:
                     Customer customer = session.hasCustomer() ? session.getCurrentCustomer() : null;
                     checkoutController.checkoutExistingCart(cart, customer);
                     break;
-                case 2:
+                case REMOVE_ITEM:
                     if (cartItems.isEmpty()) {
                         System.out.println("Cart is empty. Nothing to remove.");
                     } else {
@@ -682,7 +700,7 @@ public class MainMenuController {
                         }
                     }
                     break;
-                case 3:
+                case CLEAR_CART:
                     System.out.print("Are you sure you want to clear the entire cart? (Y/N): ");
                     String confirm = scanner.nextLine().trim().toUpperCase();
                     if (confirm.equals("Y")) {
@@ -692,12 +710,12 @@ public class MainMenuController {
                         System.out.println("Cart not cleared.");
                     }
                     break;
-                case 4:
+                case CONTINUE_SHOPPING:
                     // Do nothing, just return to menu
                     break;
-                default:
-                    System.out.println(Messages.INVALID_OPTION);
             }
+        }catch (IllegalArgumentException e) {
+                System.out.println(Messages.INVALID_OPTION);
         } catch (InputMismatchException e) {
             System.out.println(Messages.INVALID_NUMBER);
             scanner.nextLine();
