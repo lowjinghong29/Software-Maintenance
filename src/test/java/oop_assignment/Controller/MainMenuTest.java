@@ -593,7 +593,7 @@ public class MainMenuTest {
                 "admin", // password
                 "2",
                 "2",//remove
-                "9"// parfait number
+                "8"// parfait number
         ) + "\n";
 
         InputStream in = new ByteArrayInputStream(input.getBytes());
