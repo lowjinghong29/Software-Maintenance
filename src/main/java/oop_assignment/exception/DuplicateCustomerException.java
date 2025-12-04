@@ -8,7 +8,4 @@ public class DuplicateCustomerException extends TrapstarException {
         super(message);
     }
 
-    public DuplicateCustomerException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

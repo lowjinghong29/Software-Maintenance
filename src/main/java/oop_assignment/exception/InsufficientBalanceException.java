@@ -8,7 +8,4 @@ public class InsufficientBalanceException extends TrapstarException {
         super(message);
     }
 
-    public InsufficientBalanceException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

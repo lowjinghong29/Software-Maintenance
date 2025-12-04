@@ -8,7 +8,4 @@ public class InvalidQuantityException extends TrapstarException {
         super(message);
     }
 
-    public InvalidQuantityException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

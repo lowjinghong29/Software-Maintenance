@@ -8,7 +8,4 @@ public class ProductNotFoundException extends TrapstarException {
         super(message);
     }
 
-    public ProductNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }
