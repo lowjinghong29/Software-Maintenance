@@ -8,7 +8,4 @@ public class AuthenticationFailedException extends TrapstarException {
         super(message);
     }
 
-    public AuthenticationFailedException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

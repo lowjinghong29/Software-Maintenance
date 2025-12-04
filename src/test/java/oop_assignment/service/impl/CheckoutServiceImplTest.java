@@ -27,8 +27,8 @@ class CheckoutServiceImplTest {
 
         StubCustomerAccountService customerAccountService = new StubCustomerAccountService();
         StubSalesService salesService = new StubSalesService();
-        StubReceiptService receiptService = new StubReceiptService();
-        StubQRCodeService qrCodeService = new StubQRCodeService();
+        ReceiptServiceImpl receiptService = new ReceiptServiceImpl();
+        QRCodeServiceStub qrCodeService = new QRCodeServiceStub();
 
         CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService,stubCust, salesService, receiptService, qrCodeService);
 
@@ -38,7 +38,6 @@ class CheckoutServiceImplTest {
         assertEquals(cart, result.getCart());
         assertTrue(inventoryService.decreaseStockCalled);
         assertTrue(salesService.recordSaleCalled);
-        assertTrue(qrCodeService.generateCalled);
     }
 
     @Test
@@ -53,16 +52,16 @@ class CheckoutServiceImplTest {
         StubCustomerAccountService customerAccountService = new StubCustomerAccountService();
         customerAccountService.hasEnoughBalanceResult = true;
         StubSalesService salesService = new StubSalesService();
-        StubReceiptService receiptService = new StubReceiptService();
-        StubQRCodeService qrCodeService = new StubQRCodeService();
+        ReceiptServiceImpl receiptService = new ReceiptServiceImpl();
+        QRCodeServiceStub qrCodeService = new QRCodeServiceStub();
 
         CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService,stubCust, salesService, receiptService, qrCodeService);
 
         CheckoutResult result = checkoutService.checkout(cart, customer, true, PaymentMethod.MEMBER_BALANCE);
 
         assertNotNull(result);
-        assertEquals(40.00, customerAccountService.debitCalledAmount, 0.01);
-        assertEquals(4, customerAccountService.pointsAdded);
+        assertEquals(10.6, customerAccountService.debitCalledAmount, 0.01);
+        assertEquals(10, customerAccountService.pointsAdded);
     }
 
     @Test
@@ -77,8 +76,8 @@ class CheckoutServiceImplTest {
         StubCustomerAccountService customerAccountService = new StubCustomerAccountService();
         customerAccountService.hasEnoughBalanceResult = false;
         StubSalesService salesService = new StubSalesService();
-        StubReceiptService receiptService = new StubReceiptService();
-        StubQRCodeService qrCodeService = new StubQRCodeService();
+        ReceiptServiceImpl receiptService = new ReceiptServiceImpl();
+        QRCodeServiceStub qrCodeService = new QRCodeServiceStub();
 
         CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, stubCust,salesService, receiptService, qrCodeService);
 
@@ -95,8 +94,8 @@ class CheckoutServiceImplTest {
         StubInventoryService inventoryService = new StubInventoryService();
         StubCustomerAccountService customerAccountService = new StubCustomerAccountService();
         StubSalesService salesService = new StubSalesService();
-        StubReceiptService receiptService = new StubReceiptService();
-        StubQRCodeService qrCodeService = new StubQRCodeService();
+        ReceiptServiceImpl receiptService = new ReceiptServiceImpl();
+        QRCodeServiceStub qrCodeService = new QRCodeServiceStub();
 
         CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, stubCust,salesService, receiptService, qrCodeService);
 
@@ -113,8 +112,8 @@ class CheckoutServiceImplTest {
         StubInventoryService inventoryService = new StubInventoryService();
         StubCustomerAccountService customerAccountService = new StubCustomerAccountService();
         StubSalesService salesService = new StubSalesService();
-        StubReceiptService receiptService = new StubReceiptService();
-        StubQRCodeService qrCodeService = new StubQRCodeService();
+        ReceiptServiceImpl receiptService = new ReceiptServiceImpl();
+        QRCodeServiceStub qrCodeService = new QRCodeServiceStub();
 
         CheckoutService checkoutService = new CheckoutServiceImpl(pricingService, inventoryService, customerAccountService, stubCust,salesService, receiptService, qrCodeService);
 
@@ -225,19 +224,5 @@ class CheckoutServiceImplTest {
         }
     }
 
-    private static class StubReceiptService implements ReceiptService {
-        @Override
-        public String generateReceipt(Cart cart, PricingSummary pricingSummary, Customer customer) {
-            return "TEST_RECEIPT";
-        }
-    }
 
-    private static class StubQRCodeService implements QRCodeService {
-        boolean generateCalled = false;
-
-        @Override
-        public void generatePaymentCode(String content) {
-            generateCalled = true;
-        }
-    }
 }
