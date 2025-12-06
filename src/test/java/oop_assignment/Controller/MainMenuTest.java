@@ -196,7 +196,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -235,7 +234,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 new Scanner(in),
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -268,7 +266,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 new Scanner(in),
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -306,7 +303,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -341,7 +337,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -380,7 +375,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -417,7 +411,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -455,7 +448,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -485,7 +477,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 new Scanner(in),
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -526,7 +517,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -570,7 +560,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -607,7 +596,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -651,7 +639,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
@@ -686,7 +673,6 @@ public class MainMenuTest {
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
-                null,
                 reportController,
                 session,
                 authService,
