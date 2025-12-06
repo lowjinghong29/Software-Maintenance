@@ -2,7 +2,6 @@ package oop_assignment;
 
 import oop_assignment.controller.CheckoutController;
 import oop_assignment.controller.MainMenuController;
-import oop_assignment.controller.MembershipController;
 import oop_assignment.controller.ReportController;
 import oop_assignment.model.Session;
 import oop_assignment.repository.CartRepository;
@@ -63,9 +62,8 @@ public class MainApplication {
         ReportService reportService = new ReportServiceImpl(salesService);
 
         CheckoutController checkoutController = new CheckoutController(scanner, inventoryService, checkoutService, receiptService, cartRepository);
-        MembershipController membershipController = new MembershipController(scanner, session, authService, customerService, customerAccountService, cartRepository);
         ReportController reportController = new ReportController(scanner, reportService, inventoryService);
-        MainMenuController mainMenuController = new MainMenuController(scanner, checkoutController, membershipController, reportController, session, authService, customerService, inventoryService, cartRepository, customerAccountService);
+        MainMenuController mainMenuController = new MainMenuController(scanner, checkoutController, reportController, session, authService, customerService, inventoryService, cartRepository, customerAccountService);
 
         mainMenuController.start();
         scanner.close();

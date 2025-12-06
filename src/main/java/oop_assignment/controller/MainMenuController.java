@@ -26,7 +26,6 @@ import oop_assignment.model.CartItem;
 public class MainMenuController {
     private final Scanner scanner;
     private final CheckoutController checkoutController;
-    private final MembershipController membershipController;
     private final ReportController reportController;
     private final Session session;
     private final AuthService authService;
@@ -43,10 +42,9 @@ public class MainMenuController {
 "                      \\/|__|       \\/            \\/                \\/                  \\/    \\/              \\/     \\/\n";
 
     public MainMenuController(Scanner scanner, CheckoutController checkoutController,
-                              MembershipController membershipController, ReportController reportController, Session session, AuthService authService, CustomerService customerService, InventoryService inventoryService, CartRepository cartRepository, CustomerAccountService customerAccountService) {
+                              ReportController reportController, Session session, AuthService authService, CustomerService customerService, InventoryService inventoryService, CartRepository cartRepository, CustomerAccountService customerAccountService) {
         this.scanner = scanner;
         this.checkoutController = checkoutController;
-        this.membershipController = membershipController;
         this.reportController = reportController;
         this.session = session;
         this.authService = authService;
