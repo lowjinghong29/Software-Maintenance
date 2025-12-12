@@ -1,10 +1,12 @@
 package oop_assignment.service.impl;
 
+import oop_assignment.exception.DuplicateCustomerException;
 import oop_assignment.exception.InsufficientBalanceException;
 import oop_assignment.exception.InvalidInputException;
 import oop_assignment.model.Customer;
 import oop_assignment.repository.CustomerRepository;
 import oop_assignment.service.CustomerAccountService;
+import oop_assignment.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,12 +17,14 @@ import java.util.List;
 class CustomerAccountServiceImplTest {
 
     private CustomerAccountService customerAccountService;
+    private CustomerService customerService;
     private InMemoryCustomerRepository repository;
 
     @BeforeEach
     void setUp() {
         repository = new InMemoryCustomerRepository();
         customerAccountService = new CustomerAccountServiceImpl(repository);
+        customerService = new CustomerServiceImpl(repository);
     }
 
     @Test
@@ -83,6 +87,23 @@ class CustomerAccountServiceImplTest {
         assertEquals(150, customer.getLoyaltyPoints());
         Customer persisted = repository.findByEmail("john@example.com");
         assertEquals(150, persisted.getLoyaltyPoints());
+    }
+
+    @Test
+    void testDuplicateMember() {
+        // Arrange: create a customer and save it in repository
+        Customer existingCustomer = new Customer("C010","John", "pass", "john@example.com", "123", "Addr", 100, 50.00);
+        repository.addCustomer(existingCustomer); // assume this saves to customerRepository
+
+        // Act & Assert: registering a customer with the same email should throw
+        Customer duplicateCustomer = new Customer(null, "John2", "pass2", "john@example.com", "456", "Addr2", 0, 0.0);
+
+        DuplicateCustomerException exception = assertThrows(DuplicateCustomerException.class, () -> {
+            customerService.registerCustomer(duplicateCustomer);
+        });
+
+        // Optional: assert message
+        assertTrue(exception.getMessage().contains("john@example.com"));
     }
 
     private static class InMemoryCustomerRepository implements CustomerRepository {

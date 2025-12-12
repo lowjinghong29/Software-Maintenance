@@ -8,8 +8,12 @@ import oop_assignment.repository.*;
 import oop_assignment.repository.file.*;
 import oop_assignment.service.*;
 import oop_assignment.service.impl.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -70,6 +74,7 @@ public class MainMenuTest {
                 receiptService, cartRepository);
         reportController = new ReportController(new Scanner(""),reportService,inventoryService);
     }
+
 
     @BeforeEach
     void resetFiles() throws IOException {
@@ -657,19 +662,22 @@ public class MainMenuTest {
     }
 
     @Test
-    void testReport() {
+    void testReport() throws Exception {
+        // Prepare simulated user input for menu flow
         String input = String.join("\n",
-                "1",//staff login
-                "admin", //username
-                "admin", // password
-                "4",//report
-                "1",//get total revenue
-                "2"//pie chart
+                "1",      // staff login
+                "admin",  // username
+                "admin",  // password
+                "4",      // report menu
+                "1",      // get total revenue
+                "2"       // pie chart
         ) + "\n";
 
         InputStream in = new ByteArrayInputStream(input.getBytes());
         Scanner scanner = new Scanner(in);
+
         reportController = new ReportController(scanner, reportService, inventoryService);
+
         MainMenuController controller = new MainMenuController(
                 scanner,
                 checkoutController,
@@ -682,6 +690,21 @@ public class MainMenuTest {
                 customerAccountService
         );
 
+        // Start the menu-driven flow
         controller.start();
+
+        // Wait for Swing invokeLater to finish creating the JFrame
+        SwingUtilities.invokeAndWait(() -> { /* empty runnable just waits */ });
+
+        // Check that the pie chart JFrame was created
+        boolean found = false;
+        for (Frame f : Frame.getFrames()) {
+            if (f instanceof JFrame && "Sales Report Pie Chart".equals(f.getTitle())) {
+                found = true;
+                f.dispose(); // clean up
+            }
+        }
+
+        assertTrue(found, "Pie chart frame should be generated");
     }
 }
