@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
         }
         List<Customer> all = customerRepository.findAll();
         for (Customer c : all) {
-            if (c.getEmail().equalsIgnoreCase(idOrEmail.trim())) {
+            if (c.getEmail().equalsIgnoreCase(idOrEmail.trim())||c.getId().equalsIgnoreCase(idOrEmail.trim())) {
                 if (c.getPassword().equals(password)) {
                     return c;
                 } else {
