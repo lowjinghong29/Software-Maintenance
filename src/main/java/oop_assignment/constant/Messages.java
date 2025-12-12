@@ -11,7 +11,7 @@ public final class Messages {
 
     public static final String APP_TITLE = "=== Trapstar Groceries ===";
     public static final String MAIN_MENU_PROMPT = "\nPlease select an option from the menu above: ";
-    public static final String INVALID_OPTION = "\nInvalid option selected. Please choose a valid number from the menu (e.g., 1 for Staff, 2 for Customer, 0 to Exit).\n";
+    public static final String INVALID_OPTION = "\nInvalid option selected. Please choose a valid number from the menu \n";
     public static final String INVALID_NUMBER = "\nInvalid input. Please enter a valid number only.\n";
     public static final String CART_EMPTY = "\nYour shopping cart is currently empty. Add some items to get started!\n";
     public static final String CHECKOUT_SUCCESS = "\nCheckout completed successfully! Thank you for your purchase. Your receipt is shown above.\n";

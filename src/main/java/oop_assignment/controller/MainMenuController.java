@@ -236,20 +236,20 @@ public class MainMenuController {
                 // Logged in menu
                 System.out.println("\n=== Member Services ===");
                 System.out.println("Welcome back, " + session.getCurrentCustomer().getName() + " (Points: " + session.getCurrentCustomer().getLoyaltyPoints() + ")!");
-                for (CustomerMenuOption option : new CustomerMenuOption[]{
-                        CustomerMenuOption.PURCHASE_GROCERIES,
-                        CustomerMenuOption.VIEW_CART,
-                        CustomerMenuOption.REDEMPTION,
-                        CustomerMenuOption.TOP_UP,
-                        CustomerMenuOption.LOGOUT,
-                        CustomerMenuOption.BACK}) {
+                for (LoggedInMenu option : new LoggedInMenu[]{
+                        LoggedInMenu.PURCHASE_GROCERIES,
+                        LoggedInMenu.VIEW_CART,
+                        LoggedInMenu.REDEMPTION,
+                        LoggedInMenu.TOP_UP,
+                        LoggedInMenu.LOGOUT,
+                        LoggedInMenu.BACK}) {
                     System.out.println(option);
                 }
                 System.out.print(Messages.MAIN_MENU_PROMPT);
                 try {
                     int choice = scanner.nextInt();
                     scanner.nextLine(); // consume newline
-                    CustomerMenuOption option = CustomerMenuOption.fromCode(choice);
+                    LoggedInMenu option = LoggedInMenu.fromCode(choice);
                     switch (option) {
                         case PURCHASE_GROCERIES:
                             checkoutController.startCheckout(session.getCurrentCustomer());
@@ -577,6 +577,9 @@ public class MainMenuController {
                         break;
                     case LOGIN_MEMBER:
                         handleMemberLogin();
+                        if (session.hasCustomer()) {
+                            return;
+                        }
                         break;
                     case BACK:
                         return;

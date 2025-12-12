@@ -5,14 +5,8 @@ public enum CustomerMenuOption {
     GUEST(1, "No (Continue as Guest)"),
     LOGIN(2, "Yes (Login as Member)"),
     SIGN_UP(3, "Sign up as Member"),
-    BACK(0, "Back to Main Menu"),
+    BACK(0, "Back to Main Menu");
 
-    // Logged in / member menu
-    PURCHASE_GROCERIES(1, "Purchase Groceries"),
-    VIEW_CART(2, "View Cart"),
-    REDEMPTION(3, "Redemption"),
-    TOP_UP(4, "Top up Wallet"),
-    LOGOUT(5, "Logout");
 
     private final int code;
     private final String description;
@@ -30,13 +24,13 @@ public enum CustomerMenuOption {
         return description;
     }
 
-    public static CustomerMenuOption fromCode(int code) {
+        public static CustomerMenuOption fromCode(int code) {
         for (CustomerMenuOption option : values()) {
             if (option.code == code) {
                 return option;
             }
         }
-        throw new IllegalArgumentException("Invalid customer menu option: " + code);
+        throw new IllegalArgumentException("Invalid cart menu option: " + code);
     }
 
     @Override
