@@ -103,7 +103,7 @@ public class MainMenuTest {
                 "C006,Low Jing Hong,123321,jinghong@gmail.com,0124859965,52000 Kepong,0,1010.00",
                 "C007,Shek Jun Yi,12345,junyi@gmail.com,0123950049,Seremban,0,101.00",
                 "C008,Seow Theng Feng,1234,feng@gmail.com,0135944485,Gombak,64,1755.11",
-                "C009,loo,123,1@gmail,123456,35 jalan 21/34,25,18.56"
+                "C009,loo,123,1@gmail,123456,35 jalan 21/34,99,18.56"
         );
         Files.write(membershipPath, membershipContent, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
@@ -393,6 +393,49 @@ public class MainMenuTest {
 
         Cart cart = cartRepository.loadCart("guest");
         assertTrue(cart.getItems().isEmpty(), "Cart should be empty after guest checkout");
+    }
+
+    @Test
+    void testCheckoutMember() {
+        String input = String.join("\n",
+                "2",
+                "2",
+                "1@gmail",
+                "123",
+                "3",
+                "1",
+                "Y",
+                "0",
+                "1",
+                "1",
+                "1",
+                "0",
+                "y",
+                "1",
+                "1",
+                "0"
+        ) + "\n";
+
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        Scanner scanner = new Scanner(in);
+        checkoutController = new CheckoutController(scanner, inventoryService, checkoutService,
+                receiptService, cartRepository);
+        MainMenuController controller = new MainMenuController(
+                scanner,
+                checkoutController,
+                reportController,
+                session,
+                authService,
+                customerService,
+                inventoryService,
+                cartRepository,
+                customerAccountService
+        );
+
+        controller.start();
+
+        Cart cart = cartRepository.loadCart("C009");
+        assertTrue(cart.getItems().isEmpty(), "Cart should be empty after customer checkout");
     }
 
     @Test
