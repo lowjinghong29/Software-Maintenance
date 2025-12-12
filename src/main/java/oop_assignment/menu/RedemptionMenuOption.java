@@ -15,13 +15,6 @@ public enum RedemptionMenuOption {
         this.description = description;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public static RedemptionMenuOption fromCode(int code) {
         for (RedemptionMenuOption option : values()) {

@@ -16,13 +16,6 @@ public enum MainMenuOption {
         this.description = description;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public static MainMenuOption fromCode(int code) {
         for (MainMenuOption option : values()) {

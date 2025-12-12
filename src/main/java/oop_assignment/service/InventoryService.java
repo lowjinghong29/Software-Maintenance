@@ -57,7 +57,6 @@ public interface InventoryService {
      * @param amount the amount to add to stock
      * @throws ProductNotFoundException if not found
      */
-    void increaseStock(String id, int amount);
 
     /**
      * Updates a grocery item.

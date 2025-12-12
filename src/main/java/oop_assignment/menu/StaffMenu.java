@@ -16,13 +16,6 @@ public enum StaffMenu {
         this.description = description;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public static StaffMenu fromCode(int code) {
         for (StaffMenu option : values()) {

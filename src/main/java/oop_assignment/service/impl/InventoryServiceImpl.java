@@ -119,28 +119,6 @@ public class InventoryServiceImpl implements InventoryService {
         groceriesRepository.saveAll(all);
     }
 
-    @Override
-    public void increaseStock(String id, int amount) {
-        if (id == null || id.trim().isEmpty()) {
-            throw new InvalidInputException("Id cannot be null or empty");
-        }
-        if (amount <= 0) {
-            throw new InvalidQuantityException("Amount must be > 0");
-        }
-        List<Groceries> all = groceriesRepository.findAll();
-        Groceries toUpdate = null;
-        for (Groceries g : all) {
-            if (g.getName().equals(id)) {
-                toUpdate = g;
-                break;
-            }
-        }
-        if (toUpdate == null) {
-            throw new ProductNotFoundException("Product not found for id: " + id);
-        }
-        toUpdate.setStockQuantity(toUpdate.getStockQuantity() + amount);
-        groceriesRepository.saveAll(all);
-    }
 
     @Override
     public void updateGrocery(Groceries grocery) {

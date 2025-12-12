@@ -16,13 +16,6 @@ public enum GuestMenuOption {
         this.description = description;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public static GuestMenuOption fromCode(int code) {
         for (GuestMenuOption option : values()) {

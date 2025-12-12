@@ -164,10 +164,6 @@ class CheckoutServiceImplTest {
 
         }
 
-        @Override
-        public void increaseStock(String id, int amount) {
-
-        }
 
         @Override
         public void updateGrocery(Groceries grocery) {

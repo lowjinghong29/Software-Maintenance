@@ -16,13 +16,6 @@ public enum CustomerMenuOption {
         this.description = description;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
         public static CustomerMenuOption fromCode(int code) {
         for (CustomerMenuOption option : values()) {

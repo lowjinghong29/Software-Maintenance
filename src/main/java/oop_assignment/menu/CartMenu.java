@@ -14,13 +14,6 @@ public enum CartMenu {
         this.description = description;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public static CartMenu fromCode(int code) {
         for (CartMenu option : values()) {

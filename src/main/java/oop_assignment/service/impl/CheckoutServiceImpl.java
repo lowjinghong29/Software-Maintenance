@@ -56,16 +56,20 @@ public class CheckoutServiceImpl implements CheckoutService {
         }
 
         PricingSummary pricingSummary = pricingService.calculate(cart, isMember, customer);
+        int points = (int) (pricingSummary.getGrandTotal() * SystemConstants.POINTS_PER_RINGGIT);
 
         if (paymentMethod == PaymentMethod.MEMBER_BALANCE) {
             if (!customerAccountService.hasEnoughBalance(customer, pricingSummary.getGrandTotal())) {
                 throw new InsufficientBalanceException("Insufficient balance for payment");
             }
             customerAccountService.debitBalance(customer, pricingSummary.getGrandTotal());
-            int points = (int) (pricingSummary.getGrandTotal() * SystemConstants.POINTS_PER_RINGGIT);
             customerAccountService.addPoints(customer, points);
         } else if (paymentMethod == PaymentMethod.QR_PAYMENT) {
             qrCodeService.generatePaymentCode("Payment for " + pricingSummary.getGrandTotal());
+            if (customer != null) {
+                customerAccountService.addPoints(customer, points);
+            }
+
         }
 
         inventoryService.decreaseStock(cart);

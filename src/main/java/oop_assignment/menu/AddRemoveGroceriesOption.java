@@ -13,13 +13,6 @@ public enum AddRemoveGroceriesOption {
         this.description = description;
     }
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public static AddRemoveGroceriesOption fromCode(int code) {
         for (AddRemoveGroceriesOption option : values()) {
